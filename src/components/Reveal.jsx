@@ -5,6 +5,7 @@ export default function Reveal({ children, delay = 0, direction = "up", classNam
   const ref = useRef(null);
 
   useEffect(() => {
+    const currentRef = ref.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         // This makes it reappear when scrolling down, and disappear when scrolling away!
@@ -15,13 +16,13 @@ export default function Reveal({ children, delay = 0, direction = "up", classNam
       }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
   }, []);

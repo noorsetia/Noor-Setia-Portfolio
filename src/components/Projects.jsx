@@ -1,5 +1,6 @@
 import React from 'react';
 import Reveal from './Reveal';
+import { projectsData } from '../data/projectsData';
 
 const ProjectCard = ({ title, description, tags, image, liveLink }) => {
   return (
@@ -43,25 +44,6 @@ const ProjectCard = ({ title, description, tags, image, liveLink }) => {
 };
 
 export default function Projects() {
-  const projectsData =[
-    {
-      id: 1,
-      title: "World Countries Data Explorer",
-      description: "Built an interactive explorer allowing users to search, sort, and visualize country data dynamically. Features real-time filtering, multi-criteria sorting, and interactive charts displaying top populated countries and most spoken languages.",
-      tags:["JavaScript (ES6+)", "Chart.js", "HTML5 / CSS3", "DOM Manipulation"],
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // You can replace this URL with an actual screenshot of your project later!
-      liveLink: "https://worldvisual.netlify.app/"
-    },
-    {
-      id: 2,
-      title: "GYM – MERN Platform",
-      description: "A responsive fitness platform with workout sections, pricing plans, and a BMI calculator. Integrated REST APIs using Node.js and Express for form handling and MongoDB for data operations.",
-      tags: ["React", "MongoDB", "Node.js", "Express"],
-      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Replace with your actual screenshot
-      liveLink: "https://gym-frontend-eiqi.onrender.com/"
-    }
-  ];
-
   return (
     <section id="projects" className="py-24 px-6 bg-slate-50 dark:bg-slate-800/30 transition-colors duration-300 overflow-hidden">
       <div className="max-w-6xl mx-auto">

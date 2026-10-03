@@ -1,40 +1,8 @@
 import React from 'react';
 import Reveal from './Reveal';
+import { experiences } from '../data/experienceData';
 
 export default function Experience() {
-  const experiences =[
-    {
-      type: "Work",
-      title: "Hackathon & Innovation In-Charge",
-      organization: "Navgurukul",
-      date: "Oct 2024 – Jul 2025", // Updated dates here!
-      details:[
-        "Coordinated campus-level hackathons and reviewed student project submissions.",
-        "Assisted participants with Git, GitHub workflows, and debugging basics.",
-        "Evaluated projects based on code quality, functionality, and problem-solving approach."
-      ]
-    },
-    {
-      type: "Education",
-      title: "Bachelor of Computer Applications (Software Development)",
-      organization: "Eternal University, Himachal Pradesh",
-      date: "2024 – 2027",
-      details:[
-        "Focusing on core software engineering principles, web technologies, and modern application development.",
-        "Actively participating in coding communities and technical workshops."
-      ]
-    },
-    {
-      type: "Education",
-      title: "Senior Secondary (Class XII) – Non-Medical",
-      organization: "Singh Sabha Kanya Pathshala Sr. Sec. School, Abohar",
-      date: "Graduated 2024",
-      details:[
-        "Built a strong analytical and mathematical foundation essential for computer science."
-      ]
-    }
-  ];
-
   return (
     <section id="experience" className="py-24 px-6 bg-white dark:bg-slate-900 transition-colors duration-300 overflow-hidden">
       <div className="max-w-4xl mx-auto">

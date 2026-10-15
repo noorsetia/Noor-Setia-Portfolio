@@ -62,3 +62,113 @@
 .animate-scale-up {
   animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Subtle engineering grid background */
+.bg-grid-subtle {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.dark .bg-grid-subtle {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(197, 245, 74, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 3D Floating Glass Sphere & Logo Animations */
+@keyframes sphereFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-11px);
+  }
+}
+
+@keyframes sphereShadow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.38;
+  }
+  50% {
+    transform: scale(0.72);
+    opacity: 0.18;
+  }
+}
+
+@keyframes sphereRotateInternal {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes sphereCounterRotate {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes sphereGlowPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes smoothSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-sphere-float {
+  animation: sphereFloat 4.8s ease-in-out infinite;
+}
+
+.animate-sphere-shadow {
+  animation: sphereShadow 4.8s ease-in-out infinite;
+}
+
+.animate-sphere-internal {
+  animation: sphereRotateInternal 20s linear infinite;
+}
+
+.animate-sphere-counter {
+  animation: sphereCounterRotate 26s linear infinite;
+}
+
+.animate-sphere-glow {
+  animation: sphereGlowPulse 4.2s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: smoothSpin 12s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+  animation: smoothSpin 16s linear infinite reverse;
+}

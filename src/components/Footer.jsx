@@ -10,7 +10,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-slate-100 dark:bg-[#05070B] border-t border-slate-200 dark:border-white/[0.08] py-12 px-4 sm:px-6 transition-colors duration-300">
+    <footer className="bg-slate-100 dark:bg-[#080A0B] border-t border-slate-200 dark:border-white/[0.08] py-12 px-4 sm:px-6 transition-colors duration-300">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         
         {/* Brand & Tagline */}
@@ -18,10 +18,10 @@ export default function Footer() {
           <a 
             href="#top" 
             onClick={scrollToTop}
-            className="text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded p-1"
+            className="text-lg font-bold font-mono tracking-tight text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-[#C5F54A] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded p-1"
             aria-label="Noor Setia Portfolio — Back to top"
           >
-            &lt;NoorSetia /&gt;
+            <span className="text-[#C5F54A]">&lt;</span>NoorSetia <span className="text-[#C5F54A]">/&gt;</span>
           </a>
           <span className="hidden sm:inline text-slate-300 dark:text-slate-700">·</span>
           <p className="text-xs text-slate-600 dark:text-slate-400 font-mono">
@@ -35,7 +35,7 @@ export default function Footer() {
             href={personalInfo.socialLinks.github} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1"
+            className="hover:text-slate-900 dark:hover:text-[#C5F54A] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded px-1"
           >
             GitHub
           </a>
@@ -43,13 +43,13 @@ export default function Footer() {
             href={personalInfo.socialLinks.linkedin} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1"
+            className="hover:text-slate-900 dark:hover:text-[#C5F54A] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded px-1"
           >
             LinkedIn
           </a>
           <a 
             href={`mailto:${personalInfo.email}`}
-            className="hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1"
+            className="hover:text-slate-900 dark:hover:text-[#C5F54A] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded px-1"
           >
             Email
           </a>
@@ -58,7 +58,7 @@ export default function Footer() {
               href={personalInfo.resumeUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline transition-colors font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1"
+              className="text-[#C5F54A] hover:underline transition-colors font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded px-1"
             >
               Resume ↗
             </a>

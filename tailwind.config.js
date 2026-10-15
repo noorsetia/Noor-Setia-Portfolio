@@ -13,12 +13,24 @@ export default {
       },
       colors: {
         obsidian: {
-          DEFAULT: '#07090E',
+          DEFAULT: '#080A0B',
           50: '#F8FAFC',
           100: '#F1F5F9',
-          800: '#151C2C',
-          900: '#0E131F',
-          950: '#07090E',
+          800: '#161B1E',
+          900: '#101315',
+          950: '#080A0B',
+        },
+        charcoal: {
+          DEFAULT: '#101315',
+          surface: '#12171A',
+          card: '#161B1F',
+          border: 'rgba(255, 255, 255, 0.08)',
+        },
+        lime: {
+          DEFAULT: '#C5F54A',
+          light: '#D4F76E',
+          dark: '#A5D62B',
+          glow: 'rgba(197, 245, 74, 0.25)',
         },
         cobalt: {
           DEFAULT: '#2563EB',

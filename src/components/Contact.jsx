@@ -15,9 +15,24 @@ export default function Contact() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  const copyToClipboard = (text, label) => {
-    navigator.clipboard.writeText(text);
-    setCopyFeedback(`${label} copied to clipboard!`);
+  const copyToClipboard = async (text, label) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopyFeedback(`${label} copied to clipboard!`);
+    } catch {
+      setCopyFeedback(`${label}: ${text}`);
+    }
     setTimeout(() => setCopyFeedback(''), 3000);
   };
 
@@ -75,7 +90,7 @@ export default function Contact() {
   return (
     <section 
       id="contact" 
-      className="py-24 sm:py-28 px-4 sm:px-6 bg-white dark:bg-[#07090E] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]"
+      className="py-24 sm:py-28 px-4 sm:px-6 bg-white dark:bg-[#080A0B] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]"
       aria-labelledby="contact-heading"
     >
       <div className="max-w-6xl mx-auto">
@@ -83,13 +98,13 @@ export default function Contact() {
         {/* Section Header */}
         <Reveal direction="up" delay={0}>
           <div className="mb-14 sm:mb-16">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-[#C5F54A]">
               05. Get In Touch
             </span>
             <h2 id="contact-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
               Let's Build Something Solid
             </h2>
-            <div className="w-16 h-1 bg-blue-600 mt-4 rounded-full" aria-hidden="true"></div>
+            <div className="w-16 h-1 bg-[#C5F54A] mt-4 rounded-full" aria-hidden="true"></div>
             <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg max-w-xl mt-4">
               Open to Frontend and Full Stack opportunities. Let's discuss engineering roles, project collaborations, or developer ideas.
             </p>
@@ -99,12 +114,12 @@ export default function Contact() {
         {/* Copy Feedback Toast */}
         {copyFeedback && (
           <div 
-            className="fixed bottom-6 right-6 z-50 bg-slate-900 dark:bg-blue-600 text-white text-xs font-mono font-medium px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-fade-in"
+            className="fixed bottom-20 right-6 sm:bottom-6 sm:right-28 z-50 bg-slate-900 dark:bg-[#101315] border border-[#C5F54A]/40 text-[#C5F54A] text-xs font-mono font-medium px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-fade-in"
             role="status"
             aria-live="polite"
           >
-            <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            <svg className="w-4 h-4 text-[#C5F54A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
             </svg>
             <span>{copyFeedback}</span>
           </div>
@@ -115,12 +130,12 @@ export default function Contact() {
           {/* LEFT COLUMN - INTERACTIVE FORM */}
           <div className="md:col-span-7">
             <Reveal direction="left" delay={150}>
-              <div className="bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-8 rounded-2xl shadow-sm">
+              <div className="bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-8 rounded-2xl shadow-sm">
                 {isSubmitted ? (
                   <div className="py-12 text-center flex flex-col justify-center items-center">
-                    <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center mb-5 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20">
+                    <div className="w-16 h-16 bg-slate-100 dark:bg-[#C5F54A]/10 rounded-2xl flex items-center justify-center mb-5 text-[#C5F54A] border border-[#C5F54A]/30">
                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Message Delivered</h3>
@@ -141,7 +156,7 @@ export default function Contact() {
                         value={formData.name}
                         onChange={handleChange}
                         disabled={isSubmitting}
-                        className={`w-full bg-white dark:bg-[#0E1424] border ${errors.name ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors disabled:opacity-50`}
+                        className={`w-full bg-white dark:bg-[#14191D] border ${errors.name ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#C5F54A] focus:ring-1 focus:ring-[#C5F54A] transition-colors disabled:opacity-50`}
                         placeholder="Your name"
                         aria-invalid={errors.name ? 'true' : 'false'}
                         aria-describedby={errors.name ? 'name-error' : undefined}
@@ -160,7 +175,7 @@ export default function Contact() {
                         value={formData.email}
                         onChange={handleChange}
                         disabled={isSubmitting}
-                        className={`w-full bg-white dark:bg-[#0E1424] border ${errors.email ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors disabled:opacity-50`}
+                        className={`w-full bg-white dark:bg-[#14191D] border ${errors.email ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#C5F54A] focus:ring-1 focus:ring-[#C5F54A] transition-colors disabled:opacity-50`}
                         placeholder="you@example.com"
                         aria-invalid={errors.email ? 'true' : 'false'}
                         aria-describedby={errors.email ? 'email-error' : undefined}
@@ -187,7 +202,7 @@ export default function Contact() {
                         value={formData.message}
                         onChange={handleChange}
                         disabled={isSubmitting}
-                        className={`w-full bg-white dark:bg-[#0E1424] border ${errors.message ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors resize-none disabled:opacity-50`}
+                        className={`w-full bg-white dark:bg-[#14191D] border ${errors.message ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#C5F54A] focus:ring-1 focus:ring-[#C5F54A] transition-colors resize-none disabled:opacity-50`}
                         placeholder="Tell me about your team, tech stack, or engineering opportunity..."
                         aria-invalid={errors.message ? 'true' : 'false'}
                         aria-describedby={errors.message ? 'message-error' : undefined}
@@ -204,11 +219,11 @@ export default function Contact() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover:-translate-y-0.5 active:translate-y-0"
+                      className="w-full bg-[#C5F54A] hover:bg-[#D4F76E] text-slate-950 font-bold py-3.5 rounded-xl transition-all shadow-md shadow-[#C5F54A]/25 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] hover:-translate-y-0.5 active:translate-y-0"
                     >
                       {isSubmitting ? (
                         <>
-                          <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <svg className="animate-spin h-4 w-4 text-slate-950" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
@@ -218,7 +233,7 @@ export default function Contact() {
                         <>
                           <span>Send Message</span>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                           </svg>
                         </>
                       )}
@@ -232,7 +247,7 @@ export default function Contact() {
           {/* RIGHT COLUMN - DIRECT DETAILS & QUICK ACTIONS */}
           <div className="md:col-span-5 space-y-6">
             <Reveal direction="right" delay={250}>
-              <div className="bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-6 rounded-2xl shadow-sm">
+              <div className="bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-6 rounded-2xl shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Direct Channels</h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
                   Feel free to reach out directly via email or phone. I usually respond within 24 hours.
@@ -240,12 +255,12 @@ export default function Contact() {
 
                 <div className="space-y-3">
                   {/* Email Card */}
-                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] shadow-sm">
+                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-white dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06] shadow-sm">
                     <div className="overflow-hidden">
                       <p className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Email</p>
                       <a 
                         href={`mailto:${personalInfo.email}`} 
-                        className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate block focus:outline-none focus-visible:underline"
+                        className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white hover:text-blue-600 dark:hover:text-[#C5F54A] transition-colors truncate block focus:outline-none focus-visible:underline"
                       >
                         {personalInfo.email}
                       </a>
@@ -253,7 +268,7 @@ export default function Contact() {
                     <button
                       type="button"
                       onClick={() => copyToClipboard(personalInfo.email, 'Email')}
-                      className="px-2.5 py-1 text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-300 rounded border border-slate-300 dark:border-white/[0.08] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      className="px-2.5 py-1 text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-[#C5F54A]/10 text-slate-700 dark:text-slate-300 dark:hover:text-[#C5F54A] rounded border border-slate-300 dark:border-white/[0.08] dark:hover:border-[#C5F54A]/30 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
                       aria-label="Copy email address to clipboard"
                     >
                       Copy
@@ -261,12 +276,12 @@ export default function Contact() {
                   </div>
 
                   {/* Phone Card */}
-                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] shadow-sm">
+                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-white dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06] shadow-sm">
                     <div>
                       <p className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Phone</p>
                       <a 
                         href={`tel:${personalInfo.phone.replace(/[\s-]/g, '')}`} 
-                        className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus-visible:underline"
+                        className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white hover:text-blue-600 dark:hover:text-[#C5F54A] transition-colors focus:outline-none focus-visible:underline"
                       >
                         {personalInfo.phone}
                       </a>
@@ -274,7 +289,7 @@ export default function Contact() {
                     <button
                       type="button"
                       onClick={() => copyToClipboard(personalInfo.phone, 'Phone')}
-                      className="px-2.5 py-1 text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-300 rounded border border-slate-300 dark:border-white/[0.08] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      className="px-2.5 py-1 text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-[#C5F54A]/10 text-slate-700 dark:text-slate-300 dark:hover:text-[#C5F54A] rounded border border-slate-300 dark:border-white/[0.08] dark:hover:border-[#C5F54A]/30 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
                       aria-label="Copy phone number to clipboard"
                     >
                       Copy
@@ -282,7 +297,7 @@ export default function Contact() {
                   </div>
 
                   {/* Location Card */}
-                  <div className="p-3.5 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] shadow-sm">
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06] shadow-sm">
                     <p className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Location</p>
                     <p className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white">
                       {personalInfo.location}
@@ -294,7 +309,7 @@ export default function Contact() {
 
             {/* Social Network Links */}
             <Reveal direction="right" delay={350}>
-              <div className="bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-6 rounded-2xl shadow-sm">
+              <div className="bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-6 rounded-2xl shadow-sm">
                 <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
                   Professional Profiles
                 </h4>
@@ -303,22 +318,22 @@ export default function Contact() {
                     href={personalInfo.socialLinks.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/40 transition-all text-xs sm:text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-[#C5F54A]/40 transition-all text-xs sm:text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
                     aria-label="Visit Noor Setia's GitHub profile in a new tab"
                   >
                     <span>GitHub: /noorsetia</span>
-                    <span className="text-blue-600 dark:text-blue-400 font-mono text-xs">Explore Code ↗</span>
+                    <span className="text-blue-600 dark:text-[#C5F54A] font-mono text-xs">Explore Code ↗</span>
                   </a>
 
                   <a
                     href={personalInfo.socialLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/40 transition-all text-xs sm:text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-[#C5F54A]/40 transition-all text-xs sm:text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
                     aria-label="Visit Noor Setia's LinkedIn profile in a new tab"
                   >
                     <span>LinkedIn: /in/noorsetia</span>
-                    <span className="text-blue-600 dark:text-blue-400 font-mono text-xs">Connect ↗</span>
+                    <span className="text-blue-600 dark:text-[#C5F54A] font-mono text-xs">Connect ↗</span>
                   </a>
                 </div>
               </div>

@@ -57,13 +57,13 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
     <header 
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled 
-          ? 'bg-white/95 dark:bg-[#07090E]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.08] shadow-sm dark:shadow-lg dark:shadow-black/40' 
+          ? 'bg-white/95 dark:bg-[#080A0B]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.08] shadow-sm dark:shadow-lg dark:shadow-black/50' 
           : 'bg-transparent border-b border-transparent'
       }`}
     >
       {/* Top Reading Progress Bar */}
       <div 
-        className="absolute top-0 left-0 h-[2.5px] bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-400 transition-all duration-150 ease-out"
+        className="absolute top-0 left-0 h-[2.5px] bg-gradient-to-r from-[#C5F54A] via-blue-500 to-cyan-400 transition-all duration-150 ease-out"
         style={{ width: `${scrollProgress}%` }}
         aria-hidden="true"
       />
@@ -73,12 +73,12 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
         <a 
           href="#top" 
           onClick={scrollToTop}
-          className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap shrink-0 font-mono flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg p-1 group"
+          className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-[#C5F54A] transition-colors whitespace-nowrap shrink-0 font-mono flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded-lg p-1 group"
           aria-label="Noor Setia Portfolio — Back to top"
         >
-          <span className="text-blue-600 dark:text-blue-500 transition-transform group-hover:-translate-x-0.5">&lt;</span>
+          <span className="text-[#C5F54A] transition-transform group-hover:-translate-x-0.5">&lt;</span>
           <span>NoorSetia</span>
-          <span className="text-blue-600 dark:text-blue-500 transition-transform group-hover:translate-x-0.5">/&gt;</span>
+          <span className="text-[#C5F54A] transition-transform group-hover:translate-x-0.5">/&gt;</span>
         </a>
 
         {/* Zone 2: Navigation Links with Active Indicator */}
@@ -89,15 +89,15 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
               <a
                 key={link.name}
                 href={link.href}
-                className={`relative py-1 transition-colors whitespace-nowrap shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1.5 ${
+                className={`relative py-1 transition-colors whitespace-nowrap shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded px-1.5 ${
                   isActive 
-                    ? 'text-blue-600 dark:text-blue-400 font-semibold' 
+                    ? 'text-blue-600 dark:text-[#C5F54A] font-semibold' 
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 {link.name}
                 {isActive && (
-                  <span className="absolute bottom-0 left-1 right-1 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full animate-fade-in" />
+                  <span className="absolute bottom-0 left-1 right-1 h-0.5 bg-blue-600 dark:bg-[#C5F54A] rounded-full animate-fade-in" />
                 )}
               </a>
             );
@@ -111,15 +111,15 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] border border-slate-300 dark:border-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-[#12171A] dark:hover:bg-[#161C20] border border-slate-300 dark:border-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] cursor-pointer"
             aria-label="Open command menu (Ctrl+K or Cmd+K)"
             title="Open command menu"
           >
-            <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-[#C5F54A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <span className="text-[11px]">Search</span>
-            <kbd className="text-[10px] bg-white dark:bg-black/40 px-1 py-0.5 rounded border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
+            <kbd className="text-[10px] bg-white dark:bg-black/60 px-1 py-0.5 rounded border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 font-mono">
               ⌘K
             </kbd>
           </button>
@@ -128,7 +128,7 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
           <button
             type="button"
             onClick={onToggleTheme}
-            className="p-2 sm:p-2.5 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer"
+            className="p-2 sm:p-2.5 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] cursor-pointer"
             aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
@@ -145,7 +145,7 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
 
           <a
             href="#contact"
-            className="hidden sm:inline-flex items-center px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-all shadow-md shadow-blue-500/20 whitespace-nowrap shrink-0 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="hidden sm:inline-flex items-center px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-950 bg-[#C5F54A] hover:bg-[#D4F76E] rounded-lg transition-all shadow-md shadow-[#C5F54A]/20 whitespace-nowrap shrink-0 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
           >
             Get In Touch
           </a>
@@ -178,10 +178,10 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-base font-medium px-3 py-2 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                className={`text-base font-medium px-3 py-2 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] ${
                   activeSection === link.id
-                    ? 'bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 font-semibold'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04]'
+                    ? 'bg-[#C5F54A]/10 text-blue-600 dark:text-[#C5F54A] font-semibold border border-[#C5F54A]/30'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-[#C5F54A] hover:bg-slate-100 dark:hover:bg-white/[0.04]'
                 }`}
               >
                 {link.name}
@@ -192,14 +192,14 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
                 href={personalInfo.resumeUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded p-1"
+                className="text-sm font-medium text-blue-600 dark:text-[#C5F54A] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded p-1"
               >
                 View Resume ↗
               </a>
               <a
                 href="#contact"
                 onClick={() => setIsMenuOpen(false)}
-                className="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="px-4 py-2 bg-[#C5F54A] text-slate-950 text-xs font-bold rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] shadow-md shadow-[#C5F54A]/20"
               >
                 Get In Touch
               </a>

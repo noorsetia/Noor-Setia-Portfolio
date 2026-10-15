@@ -9,6 +9,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ProjectModal from './components/ProjectModal';
 import CommandPalette from './components/CommandPalette';
+import ChatAssistant from './components/ChatAssistant';
 
 export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -63,7 +64,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-[#07090E] dark:text-slate-100 font-sans selection:bg-blue-600 selection:text-white transition-colors duration-300">
+    <div className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-[#080A0B] dark:text-[#F3F3EF] font-sans selection:bg-[#C5F54A] selection:text-[#080A0B] transition-colors duration-300">
       <Header 
         isDarkMode={isDarkMode} 
         onToggleTheme={toggleTheme} 
@@ -80,6 +81,9 @@ export default function App() {
       </main>
 
       <Footer />
+
+      {/* Floating Ask Noor AI Assistant Launcher */}
+      <ChatAssistant />
 
       {/* Interactive Command Palette Modal (⌘K) */}
       <CommandPalette
@@ -101,7 +105,7 @@ export default function App() {
         <button
           type="button"
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-30 p-3 rounded-xl bg-white dark:bg-[#0E1424] text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-white border border-slate-200 dark:border-white/10 shadow-lg dark:shadow-black/60 hover:-translate-y-1 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 animate-fade-in group"
+          className="fixed bottom-6 left-6 z-30 p-3 rounded-xl bg-white dark:bg-[#101315] text-slate-700 dark:text-slate-200 hover:text-[#C5F54A] dark:hover:text-[#C5F54A] border border-slate-200 dark:border-white/10 shadow-lg dark:shadow-black/60 hover:-translate-y-1 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] animate-fade-in group"
           aria-label="Scroll back to top"
           title="Back to top"
         >

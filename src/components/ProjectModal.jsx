@@ -83,13 +83,13 @@ export default function ProjectModal({ project, onClose }) {
     >
       <div 
         ref={modalRef}
-        className="relative w-full max-w-2xl sm:max-w-3xl max-h-[92vh] flex flex-col my-auto bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all text-slate-900 dark:text-slate-100"
+        className="relative w-full max-w-2xl sm:max-w-3xl max-h-[92vh] flex flex-col my-auto bg-white dark:bg-[#101315] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all text-slate-900 dark:text-slate-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-[#0E1321] shrink-0">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-[#12171A] shrink-0">
           <div className="flex items-center gap-2.5">
-            <span className="text-[11px] font-mono font-semibold tracking-wider uppercase text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded border border-blue-200 dark:border-blue-500/20">
+            <span className="text-[11px] font-mono font-semibold tracking-wider uppercase text-blue-600 dark:text-[#C5F54A] bg-blue-50 dark:bg-[#C5F54A]/10 px-2.5 py-1 rounded border border-blue-200 dark:border-[#C5F54A]/20">
               {project.category}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
@@ -99,7 +99,7 @@ export default function ProjectModal({ project, onClose }) {
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer"
+            className="p-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] cursor-pointer"
             aria-label="Close project modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -128,7 +128,7 @@ export default function ProjectModal({ project, onClose }) {
           {project.verifiedCapabilities && (
             <div className="space-y-3 pt-1">
               <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-4 h-4 text-blue-600 dark:text-[#C5F54A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Verified Engineering Capabilities
@@ -136,8 +136,8 @@ export default function ProjectModal({ project, onClose }) {
 
               <div className="grid gap-2">
                 {project.verifiedCapabilities.map((cap, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-[#0F1626] border border-slate-200 dark:border-white/[0.06]">
-                    <span className="text-blue-600 dark:text-blue-400 font-bold text-xs mt-0.5 font-mono">0{idx + 1}</span>
+                  <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06]">
+                    <span className="text-blue-600 dark:text-[#C5F54A] font-bold text-xs mt-0.5 font-mono">0{idx + 1}</span>
                     <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{cap}</p>
                   </div>
                 ))}
@@ -164,7 +164,7 @@ export default function ProjectModal({ project, onClose }) {
         </div>
 
         {/* Modal Action Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-7 py-3.5 bg-slate-50 dark:bg-[#0E1321] border-t border-slate-200 dark:border-white/[0.08] shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-7 py-3.5 bg-slate-50 dark:bg-[#12171A] border-t border-slate-200 dark:border-white/[0.08] shrink-0">
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Live Demo Action */}
             {project.liveLink && (
@@ -172,11 +172,11 @@ export default function ProjectModal({ project, onClose }) {
                 href={project.liveLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-blue-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#C5F54A] hover:bg-[#D4F76E] text-slate-950 font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-[#C5F54A]/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
               >
                 <span>Launch Live App</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
             )}
@@ -187,7 +187,7 @@ export default function ProjectModal({ project, onClose }) {
                 href={project.repoLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-200 font-medium text-xs sm:text-sm rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-200 font-medium text-xs sm:text-sm rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
               >
                 <span>{project.backendRepoLink ? 'Frontend Repo' : 'GitHub Repo'}</span>
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -202,7 +202,7 @@ export default function ProjectModal({ project, onClose }) {
                 href={project.backendRepoLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-200 font-medium text-xs sm:text-sm rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-200 font-medium text-xs sm:text-sm rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
               >
                 <span>Backend Repo</span>
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

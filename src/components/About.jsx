@@ -117,10 +117,26 @@ export default function About() {
 
   const activeSnippet = codeTabs.find(t => t.id === activeTab) || codeTabs[0];
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(activeSnippet.raw);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyCode = async () => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(activeSnippet.raw);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = activeSnippet.raw;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleRunSnippet = () => {
@@ -128,23 +144,23 @@ export default function About() {
     setTimeout(() => {
       setIsRunning(false);
       setShowOutput(true);
-    }, 450);
+    }, 350);
   };
 
   return (
-    <section id="about" className="py-24 sm:py-28 px-4 sm:px-6 bg-white dark:bg-[#07090E] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]">
+    <section id="about" className="py-24 sm:py-28 px-4 sm:px-6 bg-white dark:bg-[#080A0B] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]">
       <div className="max-w-6xl mx-auto">
         
         {/* Section Header */}
         <Reveal direction="up" delay={0}>
           <div className="mb-14 sm:mb-16">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-[#C5F54A]">
               01. Background & Perspective
             </span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
               Engineering Mindset & Architecture
             </h2>
-            <div className="w-16 h-1 bg-blue-600 mt-4 rounded-full"></div>
+            <div className="w-16 h-1 bg-[#C5F54A] mt-4 rounded-full"></div>
           </div>
         </Reveal>
         
@@ -154,7 +170,7 @@ export default function About() {
           {/* Left Column: Narrative Cards */}
           <div className="lg:col-span-7 space-y-5">
             <Reveal direction="up" delay={150}>
-              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-blue-500/30 transition-colors">
+              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-[#C5F54A]/30 transition-colors">
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">Who I Am</h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
                   {about.whoIAm}
@@ -163,7 +179,7 @@ export default function About() {
             </Reveal>
 
             <Reveal direction="up" delay={250}>
-              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-blue-500/30 transition-colors">
+              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-[#C5F54A]/30 transition-colors">
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">What I Build</h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
                   {about.whatIBuild}
@@ -172,7 +188,7 @@ export default function About() {
             </Reveal>
 
             <Reveal direction="up" delay={350}>
-              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-blue-500/30 transition-colors">
+              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-[#C5F54A]/30 transition-colors">
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">How I Think</h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
                   {about.howIThink}
@@ -186,15 +202,15 @@ export default function About() {
             <Reveal direction="right" delay={300} className="w-full">
               <div className="rounded-2xl bg-slate-950 dark:bg-[#090D17] border border-slate-800 dark:border-white/10 shadow-2xl overflow-hidden w-full">
                 {/* Window Bar with File Tabs, Run action & Copy Action */}
-                <div className="flex items-center justify-between px-3.5 sm:px-4 py-3 bg-slate-900 dark:bg-[#0D1222] border-b border-slate-800 dark:border-white/[0.08] gap-2">
+                <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-slate-900 dark:bg-[#0D1222] border-b border-slate-800 dark:border-white/[0.08] gap-2 min-w-0">
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
                     <span className="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
                   </div>
 
-                  {/* Tabs */}
-                  <div className="flex items-center gap-1 overflow-x-auto scrollbar-none" role="tablist" aria-label="Code snippet files">
+                  {/* Tabs with smooth horizontal scroll */}
+                  <div className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 flex-1 py-0.5" role="tablist" aria-label="Code snippet files">
                     {codeTabs.map((tab) => (
                       <button
                         key={tab.id}
@@ -204,9 +220,9 @@ export default function About() {
                           setActiveTab(tab.id);
                           setShowOutput(false);
                         }}
-                        className={`px-2.5 py-1 text-xs font-mono rounded-md transition-colors cursor-pointer whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 ${
+                        className={`px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-mono rounded-md transition-colors cursor-pointer shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C5F54A] ${
                           activeTab === tab.id
-                            ? 'bg-blue-600/30 text-blue-300 border border-blue-500/40'
+                            ? 'bg-[#C5F54A]/20 text-[#C5F54A] border border-[#C5F54A]/40 font-semibold'
                             : 'text-slate-400 hover:text-slate-200'
                         }`}
                       >
@@ -221,7 +237,7 @@ export default function About() {
                       type="button"
                       onClick={handleRunSnippet}
                       disabled={isRunning}
-                      className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-2 py-1 rounded transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-[#C5F54A] hover:text-[#D4F76E] bg-[#C5F54A]/10 hover:bg-[#C5F54A]/20 border border-[#C5F54A]/30 px-2 sm:px-2.5 py-1 rounded transition-colors cursor-pointer"
                       title="Simulate executing this code snippet"
                     >
                       {isRunning ? (
@@ -237,7 +253,7 @@ export default function About() {
                     <button
                       type="button"
                       onClick={handleCopyCode}
-                      className="text-[11px] font-mono text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 transition-colors"
+                      className="text-[11px] font-mono text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                       aria-label="Copy code to clipboard"
                     >
                       {copied ? '✓ Copied' : 'Copy'}
@@ -246,15 +262,15 @@ export default function About() {
                 </div>
 
                 {/* Code Body with Protected Flow & Syntax Coloring */}
-                <div className="p-4 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto text-slate-300 max-w-full">
-                  <pre className="whitespace-pre overflow-x-auto scrollbar-thin">
-                    <code>
+                <div className="p-3 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto text-slate-300 w-full max-w-full scrollbar-thin">
+                  <table className="w-full border-collapse">
+                    <tbody>
                       {activeSnippet.codeLines.map((line, idx) => (
-                        <div key={idx} className="table-row">
-                          <span className="table-cell select-none pr-3 sm:pr-4 text-slate-600 text-right text-[11px]">
+                        <tr key={idx} className="hover:bg-white/[0.02]">
+                          <td className="select-none pr-3 sm:pr-4 text-slate-600 text-right text-[11px] align-top w-7 sm:w-8 font-mono">
                             {idx + 1}
-                          </span>
-                          <span className="table-cell">
+                          </td>
+                          <td className="align-top whitespace-pre font-mono text-left">
                             {line.type === 'comment' && (
                               <span className="text-slate-500 italic">{line.text}</span>
                             )}
@@ -263,32 +279,32 @@ export default function About() {
                             )}
                             {line.type === 'property-str' && (
                               <span>
-                                <span className="text-blue-400">{line.text.split(':')[0]}:</span>
-                                <span className="text-emerald-400">{line.text.slice(line.text.indexOf(':') + 1)}</span>
+                                <span className="text-cyan-400">{line.text.split(':')[0]}:</span>
+                                <span className="text-[#C5F54A]">{line.text.slice(line.text.indexOf(':') + 1)}</span>
                               </span>
                             )}
                             {line.type === 'property-arr' && (
                               <span>
-                                <span className="text-blue-400">{line.text.split(':')[0]}:</span>
+                                <span className="text-cyan-400">{line.text.split(':')[0]}:</span>
                                 <span className="text-amber-300">{line.text.slice(line.text.indexOf(':') + 1)}</span>
                               </span>
                             )}
                             {line.type === 'property' && (
                               <span className="text-slate-300">{line.text}</span>
                             )}
-                          </span>
-                        </div>
+                          </td>
+                        </tr>
                       ))}
-                    </code>
-                  </pre>
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Simulated Terminal Output Tray */}
                 {showOutput && (
                   <div className="bg-[#05080E] border-t border-slate-800 px-4 py-3 font-mono text-xs animate-fade-in">
                     <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800/60 text-[10px] text-slate-500">
-                      <span className="text-emerald-400 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span className="text-[#C5F54A] flex items-center gap-1.5 font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#C5F54A] animate-pulse"></span>
                         TERMINAL OUTPUT
                       </span>
                       <button 
@@ -299,7 +315,7 @@ export default function About() {
                         ✕ Close
                       </button>
                     </div>
-                    <pre className="text-emerald-300/90 whitespace-pre overflow-x-auto text-[11px] leading-relaxed">
+                    <pre className="text-[#C5F54A]/90 whitespace-pre overflow-x-auto text-[11px] leading-relaxed max-w-full">
                       {activeSnippet.output}
                     </pre>
                   </div>
@@ -308,7 +324,7 @@ export default function About() {
                 {/* Footer Status */}
                 <div className="px-4 py-2.5 bg-slate-950 dark:bg-[#070A12] border-t border-slate-800 dark:border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
                   <span>{activeSnippet.lang}</span>
-                  <span className="text-blue-400 font-medium">Clean Modular Architecture</span>
+                  <span className="text-[#C5F54A] font-medium">Clean Modular Architecture</span>
                 </div>
               </div>
             </Reveal>
@@ -331,8 +347,8 @@ export default function About() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {about.principles.map((item, index) => (
             <Reveal key={index} direction="up" delay={150 + (index * 80)}>
-              <div className="bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.06] hover:border-blue-500/40 p-5 sm:p-6 rounded-2xl hover:-translate-y-1 transition-all duration-300 shadow-sm h-full group">
-                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+              <div className="bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] hover:border-[#C5F54A]/40 p-5 sm:p-6 rounded-2xl hover:-translate-y-1 transition-all duration-300 shadow-sm h-full group">
+                <div className="w-10 h-10 bg-slate-200 dark:bg-[#C5F54A]/10 rounded-xl flex items-center justify-center text-slate-800 dark:text-[#C5F54A] mb-4 group-hover:scale-110 transition-transform">
                   {principleIcons[index]}
                 </div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">

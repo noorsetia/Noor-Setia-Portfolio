@@ -1,66 +1,160 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import Reveal from './Reveal';
 import { experiences } from '../data/experienceData';
 
 export default function Experience() {
+  const [activeTab, setActiveTab] = useState('all');
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+
+  const counts = useMemo(() => {
+    return {
+      all: experiences.length,
+      work: experiences.filter(e => e.type.toLowerCase().includes('work')).length,
+      education: experiences.filter(e => e.type.toLowerCase().includes('education')).length
+    };
+  }, []);
+
+  const filteredExperiences = useMemo(() => {
+    if (activeTab === 'all') return experiences;
+    if (activeTab === 'work') return experiences.filter(e => e.type.toLowerCase().includes('work'));
+    if (activeTab === 'education') return experiences.filter(e => e.type.toLowerCase().includes('education'));
+    return experiences;
+  }, [activeTab]);
+
   return (
-    <section id="experience" className="py-24 px-6 bg-white dark:bg-slate-900 transition-colors duration-300 overflow-hidden">
+    <section id="experience" className="py-28 px-4 sm:px-6 bg-slate-50 dark:bg-[#07090E] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]">
       <div className="max-w-4xl mx-auto">
         
-        {/* Header */}
+        {/* Section Header */}
         <Reveal direction="up" delay={0}>
-          <div className="mb-16 md:mb-24">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-6">
-              Experience & Education
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl max-w-2xl">
-              My academic journey and professional leadership experience.
-            </p>
-            <div className="w-20 h-1.5 bg-indigo-600 dark:bg-indigo-500 mt-8 rounded-full"></div>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-6">
+            <div>
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                04. Career Journey
+              </span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
+                Experience & Education
+              </h2>
+              <div className="w-16 h-1 bg-blue-600 mt-4 rounded-full" aria-hidden="true"></div>
+            </div>
+
+            {/* Segmented Filter Control with Counts */}
+            <div 
+              className="inline-flex p-1 bg-slate-200 dark:bg-[#0E1321] rounded-xl border border-slate-300 dark:border-white/[0.08] self-start sm:self-auto shadow-sm"
+              role="tablist"
+              aria-label="Filter career milestones"
+            >
+              <button
+                role="tab"
+                aria-selected={activeTab === 'all'}
+                onClick={() => setActiveTab('all')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                  activeTab === 'all'
+                    ? 'bg-white dark:bg-blue-600 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                <span>All Milestones</span>
+                <span className={`text-[10px] font-mono px-1 rounded ${
+                  activeTab === 'all' ? 'bg-slate-100 dark:bg-blue-700 text-slate-700 dark:text-white' : 'opacity-70'
+                }`}>{counts.all}</span>
+              </button>
+              
+              <button
+                role="tab"
+                aria-selected={activeTab === 'work'}
+                onClick={() => setActiveTab('work')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                  activeTab === 'work'
+                    ? 'bg-white dark:bg-blue-600 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                <span>Work & Leadership</span>
+                <span className={`text-[10px] font-mono px-1 rounded ${
+                  activeTab === 'work' ? 'bg-slate-100 dark:bg-blue-700 text-slate-700 dark:text-white' : 'opacity-70'
+                }`}>{counts.work}</span>
+              </button>
+
+              <button
+                role="tab"
+                aria-selected={activeTab === 'education'}
+                onClick={() => setActiveTab('education')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                  activeTab === 'education'
+                    ? 'bg-white dark:bg-blue-600 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                <span>Education</span>
+                <span className={`text-[10px] font-mono px-1 rounded ${
+                  activeTab === 'education' ? 'bg-slate-100 dark:bg-blue-700 text-slate-700 dark:text-white' : 'opacity-70'
+                }`}>{counts.education}</span>
+              </button>
+            </div>
           </div>
         </Reveal>
 
-        {/* Timeline */}
-        <div className="relative border-l-2 border-indigo-100 dark:border-slate-800 ml-3 md:ml-6 space-y-12 md:space-y-16">
-          {experiences.map((item, index) => (
-            <Reveal key={index} direction="up" delay={200 + (index * 150)} className="relative pl-8 md:pl-12">
-              
-              {/* Timeline Dot */}
-              <div className="absolute w-5 h-5 bg-indigo-600 dark:bg-indigo-500 rounded-full -left-[11px] top-1.5 ring-4 ring-white dark:ring-slate-900 shadow-sm"></div>
-              
-              {/* Content Card */}
-              <div className="bg-slate-50 dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-6 md:p-8 rounded-2xl hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-colors duration-300 shadow-sm group">
+        {/* Timeline Stream */}
+        <div className="relative border-l border-slate-300 dark:border-white/[0.12] ml-4 sm:ml-6 space-y-10">
+          {filteredExperiences.map((item, index) => {
+            const isHovered = hoveredIdx === index;
+            return (
+              <Reveal key={`${item.title}-${index}`} direction="up" delay={150 + (index * 100)} className="relative pl-8 sm:pl-10">
                 
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-2 block">
-                      {item.type}
-                    </span>
-                    <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                      {item.title}
-                    </h3>
-                    <h4 className="text-lg font-medium text-slate-700 dark:text-slate-300 mt-1">
-                      {item.organization}
-                    </h4>
-                  </div>
-                  <div className="flex items-center text-slate-500 dark:text-slate-400 text-sm font-medium md:mt-1 bg-white dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 w-fit shrink-0">
-                    <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"></path></svg>
-                    {item.date}
-                  </div>
+                {/* Timeline Indicator Dot with Ping Animation on Hover */}
+                <div className="absolute -left-[7px] top-2 flex items-center justify-center">
+                  {isHovered && (
+                    <span className="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-blue-400 opacity-75"></span>
+                  )}
+                  <div className={`w-3.5 h-3.5 rounded-full ring-4 ring-slate-50 dark:ring-[#07090E] transition-all duration-300 ${
+                    isHovered ? 'bg-blue-400 scale-125' : 'bg-blue-600 dark:bg-blue-500'
+                  }`}></div>
                 </div>
+                
+                {/* Milestone Card */}
+                <div 
+                  onMouseEnter={() => setHoveredIdx(index)}
+                  onMouseLeave={() => setHoveredIdx(null)}
+                  className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.08] hover:border-blue-500/50 p-6 sm:p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1 shadow-sm group"
+                >
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                          {item.type}
+                        </span>
+                        <span className="text-slate-400 dark:text-slate-600">·</span>
+                        <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                          {item.organization}
+                        </span>
+                      </div>
 
-                <ul className="space-y-3 mt-6">
-                  {item.details.map((desc, idx) => (
-                    <li key={idx} className="flex items-start text-slate-600 dark:text-slate-400 leading-relaxed">
-                      <svg className="w-5 h-5 mr-3 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                      <span>{desc}</span>
-                    </li>
-                  ))}
-                </ul>
+                      <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {item.title}
+                      </h3>
+                    </div>
 
-              </div>
-            </Reveal>
-          ))}
+                    {/* Date Badge */}
+                    <div className="text-xs font-mono font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] px-3 py-1 rounded-full w-fit shrink-0 sm:mt-1">
+                      {item.date}
+                    </div>
+                  </div>
+
+                  {/* Details List */}
+                  <ul className="space-y-2.5 mt-5">
+                    {item.details.map((desc, idx) => (
+                      <li key={idx} className="flex items-start text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                        <span className="text-blue-600 dark:text-blue-500 mr-2.5 mt-1 font-bold">›</span>
+                        <span>{desc}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
 
       </div>

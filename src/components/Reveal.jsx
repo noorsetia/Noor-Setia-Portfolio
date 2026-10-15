@@ -1,45 +1,47 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 export default function Reveal({ children, delay = 0, direction = "up", className = "" }) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return true;
+    }
+    return false;
+  });
   const ref = useRef(null);
 
   useEffect(() => {
     const currentRef = ref.current;
+    if (!currentRef) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // This makes it reappear when scrolling down, and disappear when scrolling away!
-        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
       },
       {
-        threshold: 0.15, // Triggers when 15% of the section is visible
+        threshold: 0.05,
       }
     );
 
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
+    observer.observe(currentRef);
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
+      observer.unobserve(currentRef);
     };
   }, []);
 
-  // Determine starting position based on the direction prop
-  let startClass = 'translate-y-16'; // default: slide up
-  if (direction === 'left') startClass = '-translate-x-24'; // slide in from left
-  if (direction === 'right') startClass = 'translate-x-24'; // slide in from right
+  let startClass = 'translate-y-8';
+  if (direction === 'left') startClass = '-translate-x-8';
+  if (direction === 'right') startClass = 'translate-x-8';
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 ease-out ${
+      className={`transition-all duration-700 ease-out ${
         isVisible ? 'opacity-100 translate-x-0 translate-y-0' : `opacity-0 ${startClass}`
       } ${className}`}
-      // Only delay when appearing. When disappearing, reset immediately.
-      style={{ transitionDelay: isVisible ? `${delay}ms` : '0ms' }}
+      style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
     </div>

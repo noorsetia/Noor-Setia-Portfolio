@@ -7,6 +7,7 @@ export default function Contact() {
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -14,12 +15,18 @@ export default function Contact() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
+  const copyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text);
+    setCopyFeedback(`${label} copied to clipboard!`);
+    setTimeout(() => setCopyFeedback(''), 3000);
+  };
+
   const validate = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    if (!formData.message.trim()) newErrors.message = 'Message is required';
+    if (!formData.name.trim()) newErrors.name = 'Please provide your name';
+    if (!formData.email.trim()) newErrors.email = 'Please provide an email address';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email address';
+    if (!formData.message.trim()) newErrors.message = 'Please write a message';
     return newErrors;
   };
 
@@ -54,160 +61,272 @@ export default function Contact() {
       if (result.success) {
         setIsSubmitted(true);
         setFormData({ name: '', email: '', message: '' });
-        setTimeout(() => setIsSubmitted(false), 5000);
+        setTimeout(() => setIsSubmitted(false), 6000);
       } else {
-        setErrors({ submit: "Something went wrong. Please try again." });
+        setErrors({ submit: "Submission error. Please email directly." });
       }
     } catch {
-      setErrors({ submit: "Network error. Please try again." });
+      setErrors({ submit: "Network connectivity issue. Please reach out via email." });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <section id="contact" className="py-24 px-6 max-w-6xl mx-auto mb-10 overflow-hidden">
-      
-      <Reveal direction="up" delay={0}>
-        <div className="text-center mb-16 md:mb-24">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Let's Build Something Solid
-          </h2>
-          <div className="w-24 h-1.5 bg-indigo-600 dark:bg-indigo-500 mx-auto mt-6 mb-8 rounded-full"></div>
-          <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Looking for a developer who delivers production-ready solutions? Let's connect.
-          </p>
-        </div>
-      </Reveal>
-
-      <div className="grid md:grid-cols-2 gap-16 items-start">
+    <section 
+      id="contact" 
+      className="py-24 sm:py-28 px-4 sm:px-6 bg-white dark:bg-[#07090E] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]"
+      aria-labelledby="contact-heading"
+    >
+      <div className="max-w-6xl mx-auto">
         
-        {/* LEFT COLUMN - FORM */}
-        <Reveal direction="left" delay={200} className="order-2 md:order-1">
-          {isSubmitted ? (
-            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-10 rounded-2xl text-center h-full flex flex-col justify-center items-center shadow-sm">
-              <div className="w-20 h-20 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-10 h-10 text-green-600 dark:text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-              </div>
-              <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Message Sent!</h4>
-              <p className="text-slate-600 dark:text-slate-400">Thank you for reaching out. I'll check my email and get back to you shortly.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Name</label>
-                <input
-                  type="text" id="name" name="name" value={formData.name} onChange={handleChange} disabled={isSubmitting}
-                  className={`w-full bg-slate-50 dark:bg-[#111827] border ${errors.name ? 'border-red-500' : 'border-slate-300 dark:border-slate-800'} rounded-xl px-4 py-3.5 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all duration-300 disabled:opacity-50`}
-                  placeholder="Your name"
-                />
-                {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
-              </div>
-              
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
-                <input
-                  type="email" id="email" name="email" value={formData.email} onChange={handleChange} disabled={isSubmitting}
-                  className={`w-full bg-slate-50 dark:bg-[#111827] border ${errors.email ? 'border-red-500' : 'border-slate-300 dark:border-slate-800'} rounded-xl px-4 py-3.5 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all duration-300 disabled:opacity-50`}
-                  placeholder="your@email.com"
-                />
-                {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
-              </div>
-              
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Message</label>
-                <textarea
-                  id="message" name="message" rows="6" value={formData.message} onChange={handleChange} disabled={isSubmitting}
-                  className={`w-full bg-slate-50 dark:bg-[#111827] border ${errors.message ? 'border-red-500' : 'border-slate-300 dark:border-slate-800'} rounded-xl px-4 py-3.5 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all duration-300 resize-none disabled:opacity-50`}
-                  placeholder="Tell me about your project..."
-                ></textarea>
-                {errors.message && <p className="mt-1 text-sm text-red-500">{errors.message}</p>}
-              </div>
+        {/* Section Header */}
+        <Reveal direction="up" delay={0}>
+          <div className="mb-14 sm:mb-16">
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+              05. Get In Touch
+            </span>
+            <h2 id="contact-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
+              Let's Build Something Solid
+            </h2>
+            <div className="w-16 h-1 bg-blue-600 mt-4 rounded-full" aria-hidden="true"></div>
+            <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg max-w-xl mt-4">
+              Open to Frontend and Full Stack opportunities. Let's discuss engineering roles, project collaborations, or developer ideas.
+            </p>
+          </div>
+        </Reveal>
 
-              {errors.submit && <p className="text-sm text-red-500 text-center">{errors.submit}</p>}
-              
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center shadow-lg shadow-indigo-500/20 group disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Sending...
-                  </>
+        {/* Copy Feedback Toast */}
+        {copyFeedback && (
+          <div 
+            className="fixed bottom-6 right-6 z-50 bg-slate-900 dark:bg-blue-600 text-white text-xs font-mono font-medium px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-fade-in"
+            role="status"
+            aria-live="polite"
+          >
+            <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>{copyFeedback}</span>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-12 gap-10 sm:gap-12 items-start">
+          
+          {/* LEFT COLUMN - INTERACTIVE FORM */}
+          <div className="md:col-span-7">
+            <Reveal direction="left" delay={150}>
+              <div className="bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-8 rounded-2xl shadow-sm">
+                {isSubmitted ? (
+                  <div className="py-12 text-center flex flex-col justify-center items-center">
+                    <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center mb-5 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Message Delivered</h3>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm max-w-sm">
+                      Thank you for reaching out. I will review your message and reply promptly.
+                    </p>
+                  </div>
                 ) : (
-                  <>
-                    Send Message
-                    <svg className="w-5 h-5 ml-2 transform -rotate-45 -mt-1 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                    </svg>
-                  </>
+                  <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                    <div>
+                      <label htmlFor="contact-name" className="block text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                        Your Name
+                      </label>
+                      <input
+                        type="text"
+                        id="contact-name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        disabled={isSubmitting}
+                        className={`w-full bg-white dark:bg-[#0E1424] border ${errors.name ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors disabled:opacity-50`}
+                        placeholder="Your name"
+                        aria-invalid={errors.name ? 'true' : 'false'}
+                        aria-describedby={errors.name ? 'name-error' : undefined}
+                      />
+                      {errors.name && <p id="name-error" className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.name}</p>}
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="contact-email" className="block text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        id="contact-email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        disabled={isSubmitting}
+                        className={`w-full bg-white dark:bg-[#0E1424] border ${errors.email ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors disabled:opacity-50`}
+                        placeholder="you@example.com"
+                        aria-invalid={errors.email ? 'true' : 'false'}
+                        aria-describedby={errors.email ? 'email-error' : undefined}
+                      />
+                      {errors.email && <p id="email-error" className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.email}</p>}
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label htmlFor="contact-message" className="block text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                          Project or Message Details
+                        </label>
+                        <span className={`text-[10px] font-mono ${
+                          formData.message.length > 450 ? 'text-amber-500' : 'text-slate-400 dark:text-slate-500'
+                        }`}>
+                          {formData.message.length}/500
+                        </span>
+                      </div>
+                      <textarea
+                        id="contact-message"
+                        name="message"
+                        rows="5"
+                        maxLength="500"
+                        value={formData.message}
+                        onChange={handleChange}
+                        disabled={isSubmitting}
+                        className={`w-full bg-white dark:bg-[#0E1424] border ${errors.message ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors resize-none disabled:opacity-50`}
+                        placeholder="Tell me about your team, tech stack, or engineering opportunity..."
+                        aria-invalid={errors.message ? 'true' : 'false'}
+                        aria-describedby={errors.message ? 'message-error' : undefined}
+                      ></textarea>
+                      {errors.message && <p id="message-error" className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.message}</p>}
+                    </div>
+
+                    {errors.submit && (
+                      <p className="text-xs text-red-500 font-mono text-center p-2.5 bg-red-50 dark:bg-red-500/10 rounded-lg border border-red-200 dark:border-red-500/20" role="alert">
+                        {errors.submit}
+                      </p>
+                    )}
+                    
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>Transmitting Message...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Send Message</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                        </>
+                      )}
+                    </button>
+                  </form>
                 )}
-              </button>
-            </form>
-          )}
-        </Reveal>
-
-        {/* RIGHT COLUMN - INFO */}
-        <Reveal direction="right" delay={400} className="order-1 md:order-2">
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Get in Touch</h3>
-          <p className="text-slate-600 dark:text-slate-400 text-base leading-relaxed mb-10">
-            I'm always open to discussing new projects, opportunities, or partnerships. Whether you need a full-stack developer or just want to say hello, feel free to reach out.
-          </p>
-
-          <div className="space-y-4 mb-10">
-            {/* Email Card */}
-            <div className="flex items-center p-4 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-xl hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm">
-              <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800/80 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-4 flex-shrink-0">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z"></path></svg>
               </div>
-              <div className="overflow-hidden">
-                <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-semibold">Email</p>
-                <p className="text-slate-900 dark:text-white font-medium truncate"><a href={`mailto:${personalInfo.email}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{personalInfo.email}</a></p>
-              </div>
-            </div>
-
-            {/* Phone Card */}
-            <div className="flex items-center p-4 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-xl hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm">
-              <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800/80 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-4 flex-shrink-0">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-semibold">Phone</p>
-                <p className="text-slate-900 dark:text-white font-medium">{personalInfo.phone}</p>
-                <p className="text-slate-900 dark:text-white font-medium"><a href={`tel:${personalInfo.phone.replace(/[\s-]/g, '')}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{personalInfo.phone}</a></p>
-              </div>
-            </div>
-
-            {/* Location Card */}
-            <div className="flex items-center p-4 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-xl hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm">
-              <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800/80 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-4 flex-shrink-0">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-semibold">Location</p>
-                <p className="text-slate-900 dark:text-white font-medium">{personalInfo.location}</p>
-              </div>
-            </div>
+            </Reveal>
           </div>
 
-          {/* Social Connect */}
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Connect on Social</p>
-            <div className="flex space-x-4">
-              <a href={personalInfo.socialLinks.github} target="_blank" rel="noreferrer" aria-label="GitHub" className="p-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-all duration-300 shadow-sm">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.699-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
-              </a>
-              <a href={personalInfo.socialLinks.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="p-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-all duration-300 shadow-sm">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              </a>
-            </div>
+          {/* RIGHT COLUMN - DIRECT DETAILS & QUICK ACTIONS */}
+          <div className="md:col-span-5 space-y-6">
+            <Reveal direction="right" delay={250}>
+              <div className="bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-6 rounded-2xl shadow-sm">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Direct Channels</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                  Feel free to reach out directly via email or phone. I usually respond within 24 hours.
+                </p>
+
+                <div className="space-y-3">
+                  {/* Email Card */}
+                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] shadow-sm">
+                    <div className="overflow-hidden">
+                      <p className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Email</p>
+                      <a 
+                        href={`mailto:${personalInfo.email}`} 
+                        className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate block focus:outline-none focus-visible:underline"
+                      >
+                        {personalInfo.email}
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(personalInfo.email, 'Email')}
+                      className="px-2.5 py-1 text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-300 rounded border border-slate-300 dark:border-white/[0.08] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      aria-label="Copy email address to clipboard"
+                    >
+                      Copy
+                    </button>
+                  </div>
+
+                  {/* Phone Card */}
+                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] shadow-sm">
+                    <div>
+                      <p className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Phone</p>
+                      <a 
+                        href={`tel:${personalInfo.phone.replace(/[\s-]/g, '')}`} 
+                        className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus-visible:underline"
+                      >
+                        {personalInfo.phone}
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(personalInfo.phone, 'Phone')}
+                      className="px-2.5 py-1 text-xs font-mono bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-300 rounded border border-slate-300 dark:border-white/[0.08] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      aria-label="Copy phone number to clipboard"
+                    >
+                      Copy
+                    </button>
+                  </div>
+
+                  {/* Location Card */}
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] shadow-sm">
+                    <p className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Location</p>
+                    <p className="text-xs sm:text-sm font-medium text-slate-800 dark:text-white">
+                      {personalInfo.location}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Social Network Links */}
+            <Reveal direction="right" delay={350}>
+              <div className="bg-slate-50 dark:bg-[#0B0F19] border border-slate-200 dark:border-white/[0.08] p-5 sm:p-6 rounded-2xl shadow-sm">
+                <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
+                  Professional Profiles
+                </h4>
+                <div className="flex flex-col gap-2.5">
+                  <a
+                    href={personalInfo.socialLinks.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/40 transition-all text-xs sm:text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    aria-label="Visit Noor Setia's GitHub profile in a new tab"
+                  >
+                    <span>GitHub: /noorsetia</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-mono text-xs">Explore Code ↗</span>
+                  </a>
+
+                  <a
+                    href={personalInfo.socialLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/40 transition-all text-xs sm:text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    aria-label="Visit Noor Setia's LinkedIn profile in a new tab"
+                  >
+                    <span>LinkedIn: /in/noorsetia</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-mono text-xs">Connect ↗</span>
+                  </a>
+                </div>
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
+
+        </div>
+
       </div>
     </section>
   );

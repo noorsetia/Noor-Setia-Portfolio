@@ -4,23 +4,17 @@ import { projectsData } from '../data/projectsData';
 import ProjectVisual from './ProjectVisual';
 
 function ProjectCardItem({ project, index, onOpenProjectModal }) {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const cardRef = useRef(null);
+  const spotlightRef = useRef(null);
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
+    if (spotlightRef.current) {
+      spotlightRef.current.style.background = `radial-gradient(350px circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px, rgba(197, 245, 74, 0.1), transparent 75%)`;
+    }
   };
 
   const handleCopyProjectLink = async (e) => {
@@ -57,21 +51,20 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
     >
       <article 
         ref={cardRef}
+        onMouseEnter={() => setIsHovered(true)}
         onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        onMouseLeave={() => setIsHovered(false)}
         className="relative bg-white dark:bg-[#101315] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/[0.08] hover:border-[#C5F54A]/40 flex flex-col h-full group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl shadow-sm"
         aria-labelledby={`project-title-${project.id}`}
       >
         {/* Dynamic Cursor Spotlight Effect */}
-        {isHovered && (
-          <div 
-            className="pointer-events-none absolute -inset-px rounded-2xl opacity-100 transition-opacity duration-300 z-10"
-            style={{
-              background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(197, 245, 74, 0.1), transparent 75%)`
-            }}
-            aria-hidden="true"
-          />
-        )}
+        <div
+          ref={spotlightRef}
+          className={`pointer-events-none absolute -inset-px rounded-2xl transition-opacity duration-300 z-10 ${
+            isHovered ? 'opacity-100' : 'opacity-0'
+          }`}
+          aria-hidden="true"
+        />
         
         {/* Visual Showcase (Accessible Button triggering Deep-Dive Modal) */}
         <button
@@ -102,6 +95,9 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
                 {project.title}
               </button>
             </h3>
+            <span className="shrink-0 text-[10px] font-mono uppercase tracking-wider text-[#6f8e2e] dark:text-[#C5F54A] border border-[#C5F54A]/30 bg-[#C5F54A]/10 rounded-md px-2 py-1">
+              {project.status}
+            </span>
 
             {/* Quick Share / Copy URL action */}
             {(project.liveLink || project.repoLink) && (
@@ -120,6 +116,29 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
           <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed mb-6 flex-grow">
             {project.description}
           </p>
+
+          <div className="grid gap-3 mb-6 text-xs sm:text-sm">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Problem</span>
+              <p className="mt-1 text-slate-600 dark:text-slate-300 leading-relaxed">{project.problem}</p>
+            </div>
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">My contribution</span>
+              <p className="mt-1 text-slate-600 dark:text-slate-300 leading-relaxed">{project.contribution[0]}</p>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Key features</span>
+            <ul className="mt-2 grid gap-1.5 text-xs text-slate-600 dark:text-slate-300" aria-label={`Key features of ${project.title}`}>
+              {project.caseStudyFeatures.slice(0, 3).map((feature) => (
+                <li key={feature.title} className="flex items-start gap-2 leading-relaxed">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C5F54A]" aria-hidden="true" />
+                  <span>{feature.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
           
           {/* Verified Tech Tags */}
           <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6" aria-label="Technologies used">
@@ -145,7 +164,7 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              <span>Architecture Specs</span>
+              <span>View Case Study</span>
             </button>
 
             {/* Verified External Link Group */}
@@ -198,20 +217,40 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
 
 export default function Projects({ onOpenProjectModal }) {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('featured');
 
   const categories = useMemo(() => {
+    const projectCategories = [...new Set(projectsData.map(project => project.category))];
     return [
       { name: 'All', count: projectsData.length },
-      { name: 'MERN Stack', count: projectsData.filter(p => p.category === 'MERN Stack').length },
-      { name: 'Frontend & UI', count: projectsData.filter(p => p.category === 'Frontend & UI').length },
-      { name: 'Data & Tools', count: projectsData.filter(p => p.category === 'Data & Tools').length }
+      ...projectCategories.map(name => ({
+        name,
+        count: projectsData.filter(project => project.category === name).length
+      }))
     ];
   }, []);
 
   const filteredProjects = useMemo(() => {
-    if (activeCategory === 'All') return projectsData;
-    return projectsData.filter(p => p.category === activeCategory);
-  }, [activeCategory]);
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const matchingProjects = projectsData.filter((project) => {
+      const matchesCategory = activeCategory === 'All' || project.category === activeCategory;
+      const searchableText = [
+        project.title,
+        project.description,
+        project.category,
+        ...project.tags
+      ].join(' ').toLowerCase();
+
+      return matchesCategory && (!normalizedQuery || searchableText.includes(normalizedQuery));
+    });
+
+    return [...matchingProjects].sort((first, second) => {
+      if (sortOrder === 'alphabetical') return first.title.localeCompare(second.title);
+      if (sortOrder === 'category') return first.category.localeCompare(second.category) || first.title.localeCompare(second.title);
+      return first.id - second.id;
+    });
+  }, [activeCategory, searchQuery, sortOrder]);
 
   return (
     <section 
@@ -229,55 +268,101 @@ export default function Projects({ onOpenProjectModal }) {
                 03. Selected Works
               </span>
               <h2 id="projects-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
-                Production-Ready Projects
+                Featured Projects
               </h2>
               <div className="w-16 h-1 bg-[#C5F54A] mt-4 rounded-full" aria-hidden="true"></div>
             </div>
 
-            {/* Category Filter Tabs with Counts */}
-            <div 
-              className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none"
-              role="tablist"
-              aria-label="Filter projects by technical category"
-            >
-              {categories.map((cat) => {
-                const isActive = activeCategory === cat.name;
-                return (
-                  <button
-                    key={cat.name}
-                    role="tab"
-                    aria-selected={isActive}
-                    onClick={() => setActiveCategory(cat.name)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] ${
-                      isActive
-                        ? 'bg-[#C5F54A] text-slate-950 font-bold shadow-md shadow-[#C5F54A]/20'
-                        : 'bg-slate-100 dark:bg-[#101315] text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#161B1F] border border-slate-200 dark:border-white/[0.06]'
-                    }`}
+            <div className="w-full md:w-auto flex flex-col items-stretch md:items-end gap-3">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <label className="relative">
+                  <span className="sr-only">Search projects</span>
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search projects or technologies"
+                    className="w-full sm:w-64 rounded-xl border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-900 outline-none transition-colors placeholder:text-slate-500 focus:border-[#C5F54A] focus:ring-2 focus:ring-[#C5F54A]/30 dark:border-white/[0.06] dark:bg-[#101315] dark:text-white dark:placeholder:text-slate-500"
+                  />
+                </label>
+                <label>
+                  <span className="sr-only">Sort projects</span>
+                  <select
+                    value={sortOrder}
+                    onChange={(event) => setSortOrder(event.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-700 outline-none transition-colors focus:border-[#C5F54A] focus:ring-2 focus:ring-[#C5F54A]/30 dark:border-white/[0.06] dark:bg-[#101315] dark:text-slate-300"
                   >
-                    <span>{cat.name}</span>
-                    <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                      isActive ? 'bg-slate-950/20 text-slate-950 font-semibold' : 'bg-slate-200 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400'
-                    }`}>
-                      {cat.count}
-                    </span>
-                  </button>
-                );
-              })}
+                    <option value="featured">Featured order</option>
+                    <option value="alphabetical">A–Z</option>
+                    <option value="category">Category</option>
+                  </select>
+                </label>
+              </div>
+
+              <div
+                className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none"
+                role="tablist"
+                aria-label="Filter projects by technical category"
+              >
+                {categories.map((cat) => {
+                  const isActive = activeCategory === cat.name;
+                  return (
+                    <button
+                      key={cat.name}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() => setActiveCategory(cat.name)}
+                      className={`inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] ${
+                        isActive
+                          ? 'bg-[#C5F54A] text-slate-950 font-bold shadow-md shadow-[#C5F54A]/20'
+                          : 'bg-slate-100 dark:bg-[#101315] text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#161B1F] border border-slate-200 dark:border-white/[0.06]'
+                      }`}
+                    >
+                      <span>{cat.name}</span>
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                        isActive ? 'bg-slate-950/20 text-slate-950 font-semibold' : 'bg-slate-200 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400'
+                      }`}>
+                        {cat.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </Reveal>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-          {filteredProjects.map((project, index) => (
-            <ProjectCardItem 
-              key={project.id}
-              project={project}
-              index={index}
-              onOpenProjectModal={onOpenProjectModal}
-            />
-          ))}
-        </div>
+        {filteredProjects.length > 0 ? (
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+            {filteredProjects.map((project, index) => (
+              <ProjectCardItem
+                key={project.id}
+                project={project}
+                index={index}
+                onOpenProjectModal={onOpenProjectModal}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center dark:border-white/10 dark:bg-[#101315]">
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">No matching projects</p>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              Try a different technology, project name, or category.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setActiveCategory('All');
+              }}
+              className="mt-4 rounded-lg border border-[#C5F54A]/40 px-3 py-2 text-xs font-semibold text-slate-800 transition-colors hover:bg-[#C5F54A]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] dark:text-slate-200"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
         
       </div>
     </section>

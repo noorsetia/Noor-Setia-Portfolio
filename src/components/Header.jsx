@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { personalInfo } from '../data/personalInfo';
 
 export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette }) {
@@ -6,9 +6,10 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('');
+  const scrollFrameRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const updateScrollState = () => {
       const scrollY = window.scrollY;
       setScrolled(scrollY > 20);
 
@@ -34,9 +35,23 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
       setActiveSection(current);
     };
 
+    const handleScroll = () => {
+      if (scrollFrameRef.current !== null) return;
+      scrollFrameRef.current = window.requestAnimationFrame(() => {
+        scrollFrameRef.current = null;
+        updateScrollState();
+      });
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    updateScrollState();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+        scrollFrameRef.current = null;
+      }
+    };
   }, []);
 
   const navLinks = [

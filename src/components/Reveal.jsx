@@ -17,6 +17,7 @@ export default function Reveal({ children, delay = 0, direction = "up", classNam
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+          observer.unobserve(entry.target);
         }
       },
       {
@@ -27,7 +28,7 @@ export default function Reveal({ children, delay = 0, direction = "up", classNam
     observer.observe(currentRef);
 
     return () => {
-      observer.unobserve(currentRef);
+      observer.disconnect();
     };
   }, []);
 

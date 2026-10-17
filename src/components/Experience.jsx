@@ -22,7 +22,7 @@ export default function Experience() {
   }, [activeTab]);
 
   return (
-    <section id="experience" className="py-28 px-4 sm:px-6 bg-slate-50 dark:bg-[#080A0B] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]">
+    <section id="experience" aria-labelledby="experience-heading" className="py-28 px-4 sm:px-6 bg-slate-50 dark:bg-[#080A0B] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]">
       <div className="max-w-4xl mx-auto">
         
         {/* Section Header */}
@@ -32,7 +32,7 @@ export default function Experience() {
               <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-[#C5F54A]">
                 04. Career Journey
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
+              <h2 id="experience-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
                 Experience & Education
               </h2>
               <div className="w-16 h-1 bg-[#C5F54A] mt-4 rounded-full" aria-hidden="true"></div>
@@ -150,6 +150,19 @@ export default function Experience() {
                       </li>
                     ))}
                   </ul>
+
+                  {item.technologies && (
+                    <div className="flex flex-wrap gap-1.5 mt-6 pt-4 border-t border-slate-200 dark:border-white/[0.06]" aria-label={`${item.title} technologies and methods`}>
+                      {item.technologies.map((technology) => (
+                        <span
+                          key={technology}
+                          className="text-[10px] sm:text-[11px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] px-2 py-1 rounded-md"
+                        >
+                          {technology}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                 </div>
               </Reveal>

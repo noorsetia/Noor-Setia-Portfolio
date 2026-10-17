@@ -2,6 +2,33 @@ import React, { useEffect, useRef } from 'react';
 import ProjectVisual from './ProjectVisual';
 import { personalInfo } from '../data/personalInfo';
 
+function ArchitectureDiagram({ project }) {
+  const nodes = project.architecture || [];
+
+  return (
+    <div className="rounded-xl border border-[#C5F54A]/20 bg-[#0b1012] p-3 sm:p-4">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3" aria-label={`${project.title} request flow`}>
+        {nodes.map((node, index) => (
+          <React.Fragment key={node}>
+            <div className="min-w-[120px] flex-1 rounded-lg border border-[#C5F54A]/35 bg-[#C5F54A]/10 px-2.5 py-2 text-center text-[11px] font-mono text-[#C5F54A]">
+              {node}
+            </div>
+            {index < nodes.length - 1 && (
+              <span className="text-[#C5F54A] text-lg leading-none" aria-hidden="true">→</span>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+      {project.id === 1 && (
+        <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[10px] font-mono text-slate-400">
+          <span>Auth → protected API requests</span>
+          <span>Checkout → Razorpay</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProjectModal({ project, onClose }) {
   const modalRef = useRef(null);
   const previousActiveElement = useRef(null);
@@ -83,7 +110,7 @@ export default function ProjectModal({ project, onClose }) {
     >
       <div 
         ref={modalRef}
-        className="relative w-full max-w-2xl sm:max-w-3xl max-h-[92vh] flex flex-col my-auto bg-white dark:bg-[#101315] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all text-slate-900 dark:text-slate-100"
+        className="relative w-full max-w-2xl sm:max-w-3xl max-h-[92vh] flex flex-col my-auto bg-white dark:bg-[#101315] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-y-auto transform transition-all text-slate-900 dark:text-slate-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
@@ -114,7 +141,7 @@ export default function ProjectModal({ project, onClose }) {
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="p-5 sm:p-7 space-y-6 overflow-y-auto max-h-[50vh] sm:max-h-[55vh]">
+        <div className="p-5 sm:p-7 space-y-6 flex-1 min-h-0 overflow-y-auto">
           <div>
             <h3 id="modal-project-title" className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2 leading-snug">
               {project.title}
@@ -122,20 +149,25 @@ export default function ProjectModal({ project, onClose }) {
             <p id="modal-project-desc" className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
               {project.description}
             </p>
+            <div className="grid sm:grid-cols-2 gap-4 mt-5">
+              <div>
+                <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Problem addressed</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{project.problem}</p>
+              </div>
+              <div>
+                <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Intended users</h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{project.intendedUsers}</p>
+              </div>
+            </div>
           </div>
 
-          {/* Core Functionality & Verified Capabilities */}
-          {project.verifiedCapabilities && (
+          {/* My Contribution */}
+          {project.contribution && (
             <div className="space-y-3 pt-1">
-              <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                <svg className="w-4 h-4 text-blue-600 dark:text-[#C5F54A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Verified Engineering Capabilities
-              </h4>
+              <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">My Contribution</h4>
 
               <div className="grid gap-2">
-                {project.verifiedCapabilities.map((cap, idx) => (
+                {project.contribution.map((cap, idx) => (
                   <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06]">
                     <span className="text-blue-600 dark:text-[#C5F54A] font-bold text-xs mt-0.5 font-mono">0{idx + 1}</span>
                     <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{cap}</p>
@@ -143,6 +175,50 @@ export default function ProjectModal({ project, onClose }) {
                 ))}
               </div>
             </div>
+          )}
+
+          {project.caseStudyFeatures && (
+            <div className="space-y-3">
+              <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Key Features</h4>
+              <div className="grid sm:grid-cols-2 gap-2">
+                {project.caseStudyFeatures.map((feature) => (
+                  <div key={feature.title} className="p-3 rounded-xl bg-slate-50 dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06]">
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{feature.title}</p>
+                    <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{feature.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {project.architecture && (
+            <div className="space-y-3">
+              <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Technical Architecture</h4>
+              <ArchitectureDiagram project={project} />
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                {project.architectureSummary}
+              </p>
+            </div>
+          )}
+
+          {project.challenge && (
+            <div className="p-4 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#14191D]">
+              <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Technical Challenge & Solution</h4>
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{project.challenge}</p>
+            </div>
+          )}
+
+          {project.verifiedCapabilities && (
+            <details className="group">
+              <summary className="cursor-pointer list-none text-xs font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded">
+                <span className="group-open:text-[#6f8e2e] dark:group-open:text-[#C5F54A]">Implementation references</span>
+              </summary>
+              <div className="grid gap-2 mt-3">
+                {project.verifiedCapabilities.slice(0, 4).map((cap) => (
+                  <p key={cap} className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">• {cap}</p>
+                ))}
+              </div>
+            </details>
           )}
 
           {/* Tech Stack Tags */}

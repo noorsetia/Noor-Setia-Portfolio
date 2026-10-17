@@ -3,7 +3,7 @@ import Reveal from './Reveal';
 import { personalInfo } from '../data/personalInfo';
 
 export default function Contact() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,11 +37,14 @@ export default function Contact() {
   };
 
   const validate = () => {
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+    const message = formData.message.trim();
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Please provide your name';
-    if (!formData.email.trim()) newErrors.email = 'Please provide an email address';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email address';
-    if (!formData.message.trim()) newErrors.message = 'Please write a message';
+    if (!name) newErrors.name = 'Please provide your name';
+    if (!email) newErrors.email = 'Please provide an email address';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = 'Please enter a valid email address';
+    if (!message) newErrors.message = 'Please write a message';
     return newErrors;
   };
 
@@ -57,31 +60,31 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch('/api/contact', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
-          access_key: "3bee2b90-fa51-415d-90b1-a076db166e2b", 
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          subject: formData.subject.trim(),
+          message: formData.message.trim(),
         }),
       });
 
       const result = await response.json();
 
-      if (result.success) {
+      if (response.ok && result.success) {
         setIsSubmitted(true);
-        setFormData({ name: '', email: '', message: '' });
-        setTimeout(() => setIsSubmitted(false), 6000);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setErrors({});
       } else {
-        setErrors({ submit: "Submission error. Please email directly." });
+        setErrors({ submit: result.error || "Unable to send your message. Please email directly." });
       }
     } catch {
-      setErrors({ submit: "Network connectivity issue. Please reach out via email." });
+      setErrors({ submit: "The contact service is unavailable. Your message is still here, so please retry or email directly." });
     } finally {
       setIsSubmitting(false);
     }
@@ -139,9 +142,16 @@ export default function Contact() {
                       </svg>
                     </div>
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Message Delivered</h3>
-                    <p className="text-slate-600 dark:text-slate-300 text-sm max-w-sm">
-                      Thank you for reaching out. I will review your message and reply promptly.
+                    <p className="text-slate-600 dark:text-slate-300 text-sm max-w-sm" role="status" aria-live="polite">
+                      Your message has been sent successfully. I’ll get back to you as soon as possible.
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsSubmitted(false)}
+                      className="mt-6 text-xs font-mono font-semibold text-[#6f8e2e] dark:text-[#C5F54A] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded px-2 py-1"
+                    >
+                      Send another message
+                    </button>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5" noValidate>
@@ -158,6 +168,7 @@ export default function Contact() {
                         disabled={isSubmitting}
                         className={`w-full bg-white dark:bg-[#14191D] border ${errors.name ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#C5F54A] focus:ring-1 focus:ring-[#C5F54A] transition-colors disabled:opacity-50`}
                         placeholder="Your name"
+                        autoComplete="name"
                         aria-invalid={errors.name ? 'true' : 'false'}
                         aria-describedby={errors.name ? 'name-error' : undefined}
                       />
@@ -177,10 +188,29 @@ export default function Contact() {
                         disabled={isSubmitting}
                         className={`w-full bg-white dark:bg-[#14191D] border ${errors.email ? 'border-red-500' : 'border-slate-300 dark:border-white/[0.08]'} rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#C5F54A] focus:ring-1 focus:ring-[#C5F54A] transition-colors disabled:opacity-50`}
                         placeholder="you@example.com"
+                        autoComplete="email"
                         aria-invalid={errors.email ? 'true' : 'false'}
                         aria-describedby={errors.email ? 'email-error' : undefined}
                       />
                       {errors.email && <p id="email-error" className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.email}</p>}
+                    </div>
+
+                    <div>
+                      <label htmlFor="contact-subject" className="block text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                        Subject <span className="normal-case tracking-normal font-normal text-slate-400">(optional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="contact-subject"
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        disabled={isSubmitting}
+                        maxLength="200"
+                        className="w-full bg-white dark:bg-[#14191D] border border-slate-300 dark:border-white/[0.08] rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#C5F54A] focus:ring-1 focus:ring-[#C5F54A] transition-colors disabled:opacity-50"
+                        placeholder="Internship, collaboration, or project inquiry"
+                        autoComplete="off"
+                      />
                     </div>
                     
                     <div>
@@ -211,9 +241,15 @@ export default function Contact() {
                     </div>
 
                     {errors.submit && (
-                      <p className="text-xs text-red-500 font-mono text-center p-2.5 bg-red-50 dark:bg-red-500/10 rounded-lg border border-red-200 dark:border-red-500/20" role="alert">
-                        {errors.submit}
-                      </p>
+                      <div className="text-xs text-red-500 font-mono text-center p-2.5 bg-red-50 dark:bg-red-500/10 rounded-lg border border-red-200 dark:border-red-500/20" role="alert">
+                        <p>{errors.submit}</p>
+                        <button
+                          type="submit"
+                          className="mt-2 font-semibold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] rounded"
+                        >
+                          Retry sending
+                        </button>
+                      </div>
                     )}
                     
                     <button
@@ -227,7 +263,7 @@ export default function Contact() {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          <span>Transmitting Message...</span>
+                          <span>                          Sending message...</span>
                         </>
                       ) : (
                         <>
@@ -238,6 +274,7 @@ export default function Contact() {
                         </>
                       )}
                     </button>
+                    <input type="text" name="company" tabIndex="-1" autoComplete="off" className="hidden" aria-hidden="true" />
                   </form>
                 )}
               </div>
@@ -334,6 +371,17 @@ export default function Contact() {
                   >
                     <span>LinkedIn: /in/noorsetia</span>
                     <span className="text-blue-600 dark:text-[#C5F54A] font-mono text-xs">Connect ↗</span>
+                  </a>
+
+                  <a
+                    href={personalInfo.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#14191D] border border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-[#C5F54A]/40 transition-all text-xs sm:text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
+                    aria-label="Open Noor Setia's resume in a new tab"
+                  >
+                    <span>Resume</span>
+                    <span className="text-blue-600 dark:text-[#C5F54A] font-mono text-xs">Open Resume ↗</span>
                   </a>
                 </div>
               </div>

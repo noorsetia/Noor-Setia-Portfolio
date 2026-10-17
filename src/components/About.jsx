@@ -1,6 +1,23 @@
 import React, { useState } from 'react';
 import Reveal from './Reveal';
 import { personalInfo } from '../data/personalInfo';
+import { projectsData } from '../data/projectsData';
+
+const projectPreviewData = projectsData.map(({ title, category, tags, repoLink, liveLink }) => ({
+  title,
+  category,
+  technologies: tags,
+  githubUrl: repoLink,
+  liveUrl: liveLink
+}));
+
+const projectPreviewSource = `// Frontend-friendly portfolio project data
+export const projectsData = ${JSON.stringify(projectPreviewData, null, 2)};`;
+
+const projectPreviewCodeLines = projectPreviewSource.split('\n').map((text) => ({
+  text,
+  type: text.trimStart().startsWith('//') ? 'comment' : text.includes(':') ? 'property-str' : 'code'
+}));
 
 const principleIcons = [
   <svg key="arch" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>,
@@ -14,14 +31,13 @@ const codeTabs = [
     id: 'profile',
     title: 'developer.ts',
     lang: 'TypeScript',
-    output: `// Execution Result [Status: 200 OK - 14ms]
+    output: `// PORTFOLIO PREVIEW (illustrative)
 {
+  "profileLoaded": true,
   "engineer": "Noor Setia",
-  "status": "Available for Opportunities",
-  "education": "BCA (Software Dev, 2024–2027)",
-  "specialization": "Full Stack MERN & REST APIs",
-  "verifiedProjects": 4,
-  "activeFocus": "AI / ML & System Architecture"
+  "role": "Full Stack MERN Developer",
+  "projectsShown": ${projectsData.length},
+  "categories": ["Frontend", "Backend", "Databases"]
 }`,
     raw: `// Noor Setia — Engineering Profile
 const engineer = {
@@ -46,67 +62,75 @@ const engineer = {
     id: 'arch',
     title: 'api-controller.ts',
     lang: 'TypeScript',
-    output: `// Execution Result [POST /api/v1/orders - 201 Created]
-{
-  "success": true,
-  "order": {
-    "orderId": "ord_9a7b2c",
-    "gateway": "Razorpay",
-    "status": "captured",
-    "verified": true
+    output: `// PORTFOLIO PREVIEW (illustrative only)
+// These routes are a code sample, not a running portfolio API.
+GET /api/portfolio/profile
+GET /api/portfolio/skills
+GET /api/portfolio/projects`,
+    raw: `// Illustrative portfolio controller
+// This sample is not a running portfolio API.
+export class PortfolioController {
+  getProfile() {
+    return portfolioProfile;
+  }
+
+  getSkills() {
+    return skills;
+  }
+
+  getProjects() {
+    return projectsData;
   }
 }`,
-    raw: `// Modular Controller & Gateway Integration
-export const createOrder = async (req, res) => {
-  const { cart, userId } = req.body;
-  const order = await orderService.checkout({
-    userId,
-    items: cart,
-    gateway: "Razorpay"
-  });
-  return res.status(201).json({ success: true, order });
-};`,
     codeLines: [
-      { text: '// Modular Controller & Gateway Integration', type: 'comment' },
-      { text: 'export const createOrder = async (req, res) => {', type: 'code' },
-      { text: '  const { cart, userId } = req.body;', type: 'code' },
-      { text: '  const order = await orderService.checkout({', type: 'code' },
-      { text: '    userId,', type: 'property' },
-      { text: '    items: cart,', type: 'property' },
-      { text: '    gateway: "Razorpay"', type: 'property-str' },
-      { text: '  });', type: 'code' },
-      { text: '  return res.status(201).json({ success: true, order });', type: 'code' },
-      { text: '};', type: 'code' }
+      { text: '// Illustrative portfolio controller', type: 'comment' },
+      { text: '// This sample is not a running portfolio API.', type: 'comment' },
+      { text: 'export class PortfolioController {', type: 'code' },
+      { text: '  getProfile() {', type: 'code' },
+      { text: '    return portfolioProfile;', type: 'property' },
+      { text: '  }', type: 'code' },
+      { text: '', type: 'code' },
+      { text: '  getSkills() {', type: 'code' },
+      { text: '    return skills;', type: 'property' },
+      { text: '  }', type: 'code' },
+      { text: '', type: 'code' },
+      { text: '  getProjects() {', type: 'code' },
+      { text: '    return projectsData;', type: 'property' },
+      { text: '  }', type: 'code' },
+      { text: '}', type: 'code' }
     ]
   },
   {
-    id: 'schema',
-    title: 'order.model.ts',
-    lang: 'Mongoose Schema',
-    output: `// Mongoose Model Registered [Collection: "orders"]
+    id: 'projects',
+    title: 'projectsData.js',
+    lang: 'JavaScript / Data',
+    output: `// PORTFOLIO PREVIEW (illustrative)
 {
-  "indexes": ["userId_1", "createdAt_-1"],
-  "validation": "strict",
-  "connection": "mongodb+srv://.../nestora_prod"
+  "projectsShown": ${projectPreviewData.length},
+  "projectNames": ${JSON.stringify(projectPreviewData.map(({ title }) => title))},
+  "links": "read from src/data/projectsData.js"
 }`,
-    raw: `// Structured Mongoose Schema with Strict Validation
-const orderSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  items: [{ productId: String, quantity: Number, price: Number }],
-  total: { type: Number, required: true },
-  paymentStatus: { type: String, enum: ['pending', 'paid'], default: 'pending' }
-}, { timestamps: true });`,
-    codeLines: [
-      { text: '// Structured Mongoose Schema with Strict Validation', type: 'comment' },
-      { text: 'const orderSchema = new Schema({', type: 'code' },
-      { text: '  userId: { type: ObjectId, ref: "User", required: true },', type: 'property' },
-      { text: '  items: [{ productId: String, quantity: Number }],', type: 'property' },
-      { text: '  total: { type: Number, required: true },', type: 'property' },
-      { text: '  paymentStatus: { type: String, enum: ["pending", "paid"] }', type: 'property-str' },
-      { text: '}, { timestamps: true });', type: 'code' }
-    ]
+    raw: projectPreviewSource,
+    codeLines: projectPreviewCodeLines
   }
 ];
+
+function AnimatedCardHeading({ children }) {
+  return (
+    <h3 className="about-card-heading" aria-label={children}>
+      {Array.from(children).map((character, index) => (
+        <span
+          key={`${character}-${index}`}
+          aria-hidden="true"
+          className={character === ' ' ? 'about-card-letter about-card-letter-space' : 'about-card-letter'}
+          style={{ '--letter-index': index }}
+        >
+          {character === ' ' ? '\u00A0' : character}
+        </span>
+      ))}
+    </h3>
+  );
+}
 
 export default function About() {
   const { about } = personalInfo;
@@ -148,7 +172,7 @@ export default function About() {
   };
 
   return (
-    <section id="about" className="py-24 sm:py-28 px-4 sm:px-6 bg-white dark:bg-[#080A0B] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]">
+    <section id="about" aria-labelledby="about-heading" className="py-24 sm:py-28 px-4 sm:px-6 bg-white dark:bg-[#080A0B] transition-colors duration-300 overflow-hidden border-t border-slate-200 dark:border-white/[0.04]">
       <div className="max-w-6xl mx-auto">
         
         {/* Section Header */}
@@ -157,7 +181,7 @@ export default function About() {
             <span className="text-xs font-mono font-semibold uppercase tracking-wider text-blue-600 dark:text-[#C5F54A]">
               01. Background & Perspective
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
+            <h2 id="about-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mt-2">
               Engineering Mindset & Architecture
             </h2>
             <div className="w-16 h-1 bg-[#C5F54A] mt-4 rounded-full"></div>
@@ -171,8 +195,8 @@ export default function About() {
           <div className="lg:col-span-7 space-y-5">
             <Reveal direction="up" delay={150}>
               <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-[#C5F54A]/30 transition-colors">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">Who I Am</h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                <AnimatedCardHeading>Who I Am</AnimatedCardHeading>
+                <p className="about-card-copy text-slate-600 dark:text-slate-300 text-sm sm:text-base">
                   {about.whoIAm}
                 </p>
               </div>
@@ -180,8 +204,8 @@ export default function About() {
 
             <Reveal direction="up" delay={250}>
               <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-[#C5F54A]/30 transition-colors">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">What I Build</h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                <AnimatedCardHeading>What I Build</AnimatedCardHeading>
+                <p className="about-card-copy text-slate-600 dark:text-slate-300 text-sm sm:text-base">
                   {about.whatIBuild}
                 </p>
               </div>
@@ -189,8 +213,8 @@ export default function About() {
 
             <Reveal direction="up" delay={350}>
               <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] shadow-sm hover:border-[#C5F54A]/30 transition-colors">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2">How I Think</h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                <AnimatedCardHeading>How I Think</AnimatedCardHeading>
+                <p className="about-card-copy text-slate-600 dark:text-slate-300 text-sm sm:text-base">
                   {about.howIThink}
                 </p>
               </div>
@@ -200,7 +224,7 @@ export default function About() {
           {/* Right Column: Interactive Code Sandbox Card */}
           <div className="lg:col-span-5 w-full min-w-0 mt-2 lg:mt-0">
             <Reveal direction="right" delay={300} className="w-full">
-              <div className="rounded-2xl bg-slate-950 dark:bg-[#090D17] border border-slate-800 dark:border-white/10 shadow-2xl overflow-hidden w-full">
+              <div className="about-editor min-w-0 max-w-full box-border rounded-2xl bg-slate-950 dark:bg-[#090D17] border border-slate-800 dark:border-white/10 shadow-2xl overflow-hidden w-full">
                 {/* Window Bar with File Tabs, Run action & Copy Action */}
                 <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-slate-900 dark:bg-[#0D1222] border-b border-slate-800 dark:border-white/[0.08] gap-2 min-w-0">
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -262,8 +286,8 @@ export default function About() {
                 </div>
 
                 {/* Code Body with Protected Flow & Syntax Coloring */}
-                <div className="p-3 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto text-slate-300 w-full max-w-full scrollbar-thin">
-                  <table className="w-full border-collapse">
+                <div className="about-editor-code p-3 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto overscroll-x-contain text-slate-300 w-full max-w-full scrollbar-thin">
+                  <table className="min-w-max w-full border-collapse">
                     <tbody>
                       {activeSnippet.codeLines.map((line, idx) => (
                         <tr key={idx} className="hover:bg-white/[0.02]">
@@ -299,7 +323,22 @@ export default function About() {
                   </table>
                 </div>
 
-                {/* Simulated Terminal Output Tray */}
+                <div className="px-3 sm:px-5 py-3 border-t border-slate-800/80 dark:border-white/[0.06]">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] font-mono" aria-label="Portfolio information flow">
+                    <span className="about-flow-node">Profile</span>
+                    <span className="about-flow-arrow" aria-hidden="true">→</span>
+                    <span className="about-flow-node">Skills</span>
+                    <span className="about-flow-arrow" aria-hidden="true">→</span>
+                    <span className="about-flow-node">Projects</span>
+                    <span className="about-flow-arrow" aria-hidden="true">→</span>
+                    <span className="about-flow-node">Experience</span>
+                  </div>
+                  <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+                    A neutral view of the portfolio information presented across the editor examples.
+                  </p>
+                </div>
+
+                {/* Portfolio Preview Output Tray */}
                 {showOutput && (
                   <div className="bg-[#05080E] border-t border-slate-800 px-4 py-3 font-mono text-xs animate-fade-in">
                     <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800/60 text-[10px] text-slate-500">
@@ -315,14 +354,14 @@ export default function About() {
                         ✕ Close
                       </button>
                     </div>
-                    <pre className="text-[#C5F54A]/90 whitespace-pre overflow-x-auto text-[11px] leading-relaxed max-w-full">
+                    <pre className="text-[#C5F54A]/90 whitespace-pre-wrap break-words text-[11px] leading-relaxed max-w-full">
                       {activeSnippet.output}
                     </pre>
                   </div>
                 )}
 
                 {/* Footer Status */}
-                <div className="px-4 py-2.5 bg-slate-950 dark:bg-[#070A12] border-t border-slate-800 dark:border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2.5 bg-slate-950 dark:bg-[#070A12] border-t border-slate-800 dark:border-white/[0.06] text-[11px] font-mono text-slate-400">
                   <span>{activeSnippet.lang}</span>
                   <span className="text-[#C5F54A] font-medium">Clean Modular Architecture</span>
                 </div>

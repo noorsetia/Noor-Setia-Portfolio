@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import FloatingSphere from './FloatingSphere';
 import RotatingLogo from './RotatingLogo';
 import EnergyOrb from './EnergyOrb';
+import energySphereImage from '../assets/generated-energy-sphere.png';
 
 const SUGGESTED_PROMPTS = [
-  "What’s your strongest project?",
+  "Tell me about the NESTORA project.",
   "What’s your tech stack?",
-  "Are you open to internships?",
-  "I’d like to leave you a message"
+  "What did Noor work on at Vedonyx?",
+  "Is Noor open to internships?"
 ];
 
 export default function ChatAssistant() {
@@ -17,6 +18,7 @@ export default function ChatAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [launcherImageFailed, setLauncherImageFailed] = useState(false);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -46,7 +48,8 @@ export default function ChatAssistant() {
   // Focus input when opened
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 150);
+      const focusTimer = setTimeout(() => inputRef.current?.focus(), 150);
+      return () => clearTimeout(focusTimer);
     }
   }, [isOpen]);
 
@@ -61,30 +64,35 @@ export default function ChatAssistant() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  const handleSendMessage = async (textToSend) => {
+  const handleSendMessage = async (textToSend, { appendUserMessage = true } = {}) => {
     const text = (textToSend || inputValue).trim();
     if (!text || isLoading) return;
 
     lastPromptRef.current = text;
-    setInputValue('');
+    if (appendUserMessage) setInputValue('');
     setErrorMsg(null);
 
-    messageCounterRef.current += 1;
-    const userMessage = {
-      role: 'user',
-      content: text,
-      id: `user-${messageCounterRef.current}`
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    if (appendUserMessage) {
+      messageCounterRef.current += 1;
+      const userMessage = {
+        role: 'user',
+        content: text,
+        id: `user-${messageCounterRef.current}`
+      };
+      setMessages(prev => [...prev, userMessage]);
+    }
     setIsLoading(true);
 
+    let timeout;
     try {
+      const controller = new AbortController();
+      timeout = window.setTimeout(() => controller.abort(), 20000);
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        signal: controller.signal,
         body: JSON.stringify({
           message: text,
           history: messages.map(m => ({
@@ -94,14 +102,15 @@ export default function ChatAssistant() {
         })
       });
 
-      const data = await response.json();
+      window.clearTimeout(timeout);
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         if (data.configured === false) {
           setIsConfigured(false);
-          throw new Error("I'm currently resting while my server API key is configured. You can explore Noor's projects, resume, or contact Noor directly!");
+          throw new Error("I’m having trouble connecting right now. You can explore Noor’s projects or contact Noor directly.");
         }
-        throw new Error(data.error || 'Unable to connect to the assistant right now. Please try again.');
+        throw new Error('I couldn’t get a response right now. Please try again.');
       }
 
       messageCounterRef.current += 1;
@@ -114,15 +123,20 @@ export default function ChatAssistant() {
         }
       ]);
     } catch (err) {
-      setErrorMsg(err.message || 'Unable to connect to the assistant.');
+      const message = err?.name === 'AbortError'
+        ? 'The response took too long. Please try again.'
+        : 'I’m having trouble connecting right now. You can explore Noor’s projects or contact Noor directly.';
+      setErrorMsg(message);
+      setInputValue(text);
     } finally {
+      window.clearTimeout(timeout);
       setIsLoading(false);
     }
   };
 
   const handleRetry = () => {
     if (lastPromptRef.current) {
-      handleSendMessage(lastPromptRef.current);
+      handleSendMessage(lastPromptRef.current, { appendUserMessage: false });
     }
   };
 
@@ -160,35 +174,43 @@ export default function ChatAssistant() {
 
   return (
     <>
-      {/* Floating Launcher Hover Button Matching Image 2 */}
+      {/* Floating launcher */}
       <button
         type="button"
         onClick={() => setIsOpen(prev => !prev)}
-        aria-label="Open Ask Noor anything AI Assistant"
-        className="fixed bottom-6 right-6 z-40 group flex items-center gap-3 pl-2.5 pr-4.5 py-2 bg-[#0B0F12]/95 hover:bg-[#12181B] text-white border border-[#C5F54A]/35 hover:border-[#C5F54A] rounded-full shadow-2xl shadow-black/80 hover:shadow-[0_0_24px_rgba(197,245,74,0.35)] transition-all duration-300 hover:scale-[1.03] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#C5F54A] cursor-pointer backdrop-blur-xl"
+        aria-label="Open Ask Noor AI"
+        className="ai-launcher fixed bottom-6 right-6 z-40 group flex h-[50px] w-[160px] items-center justify-between rounded-full bg-[#C5F54A] px-2.5 text-slate-950 shadow-[0_8px_24px_rgba(197,245,74,0.2)] transition-[width,padding,box-shadow,background-color] duration-300 ease-out hover:w-[180px] hover:bg-[#D4F76E] hover:shadow-[0_10px_30px_rgba(197,245,74,0.4)] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] cursor-pointer"
       >
-        {/* Animated 3D Energy Orb as shown in Image 2 */}
-        <div className="relative flex items-center justify-center">
-          <EnergyOrb size={28} glow={false} />
-          {/* Subtle Live Status Indicator Badge */}
-          <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C5F54A] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#C5F54A] border border-black shadow-[0_0_6px_#C5F54A]"></span>
-          </span>
-        </div>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black">
+          {launcherImageFailed ? (
+            <EnergyOrb size={32} animate={false} glow={false} />
+          ) : (
+            <img
+              src={energySphereImage}
+              alt=""
+              onError={() => setLauncherImageFailed(true)}
+              decoding="async"
+              width="32"
+              height="32"
+              className="h-full w-full rounded-full object-cover"
+              draggable="false"
+            />
+          )}
+        </span>
 
-        {/* Button Label */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs sm:text-[13px] font-mono font-bold tracking-wide text-white group-hover:text-[#C5F54A] transition-colors">
-            Ask Noor anything
-          </span>
-        </div>
+        <span className="whitespace-nowrap text-[13px] font-semibold tracking-tight">
+          Ask Noor AI
+        </span>
+
+        <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M7.25 6.5h5.5A4.25 4.25 0 0117 10.75v.5a4.25 4.25 0 01-4.25 4.25H9.5l-3 2.25v-3.05a4.25 4.25 0 01-1.5-3.2v-.75A4.25 4.25 0 017.25 6.5z" />
+        </svg>
       </button>
 
       {/* Floating Chat Modal Panel Matching Reference */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:justify-end p-2.5 sm:p-6 bg-black/65 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs animate-fade-in"
           onClick={() => setIsOpen(false)}
         >
           <div
@@ -197,7 +219,7 @@ export default function ChatAssistant() {
             aria-modal="true"
             aria-label="Ask Noor anything AI Chat Assistant"
             onClick={e => e.stopPropagation()}
-            className="relative w-full sm:w-[480px] md:w-[500px] max-h-[92vh] sm:max-h-[660px] flex flex-col bg-[#0A0E10]/95 backdrop-blur-xl border border-[#C5F54A]/35 rounded-[28px] shadow-2xl shadow-black/85 overflow-hidden bg-grid-subtle transition-all duration-300"
+            className="fixed bottom-[82px] right-6 w-[min(360px,calc(100vw-48px))] h-[min(530px,calc(100vh-106px))] flex flex-col bg-[#0A0E10]/80 backdrop-blur-xl border border-[#C5F54A]/45 rounded-[22px] shadow-2xl shadow-black/85 overflow-hidden bg-grid-subtle transition-all duration-300"
           >
             {/* Ambient Background Glow inside panel */}
             <div 
@@ -210,14 +232,16 @@ export default function ChatAssistant() {
             />
 
             {/* Clean Minimalist Header */}
-            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-white/[0.06] bg-[#070B0D]/60 shrink-0">
-              <div className="flex items-center gap-3">
-                <RotatingLogo size={22} />
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-[#070B0D]/45 shrink-0">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/80">
+                  <RotatingLogo size={18} />
+                </span>
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-tight">
+                  <h3 className="text-sm font-bold text-white tracking-tight leading-tight">
                     Ask Noor anything
                   </h3>
-                  <p className="text-[10px] sm:text-[11px] font-mono tracking-wider text-slate-400 flex items-center gap-1.5 uppercase mt-0.5">
+                  <p className="text-[9px] font-mono tracking-wide text-slate-400 flex items-center gap-1 uppercase mt-0.5 whitespace-nowrap">
                     <span 
                       className={`w-1.5 h-1.5 rounded-full ${isConfigured ? 'bg-[#C5F54A] shadow-[0_0_8px_#C5F54A]' : 'bg-emerald-400'}`}
                       title={isConfigured ? 'AI Twin Active' : 'Online'}
@@ -228,27 +252,13 @@ export default function ChatAssistant() {
               </div>
 
               <div className="flex items-center gap-1 sm:gap-2">
-                {messages.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMessages([]);
-                      setErrorMsg(null);
-                    }}
-                    aria-label="Start new conversation"
-                    className="text-[11px] font-mono text-slate-400 hover:text-[#C5F54A] px-2.5 py-1 rounded-md hover:bg-white/[0.06] transition-colors cursor-pointer"
-                    title="Start new conversation"
-                  >
-                    New chat
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
                   aria-label="Close chat assistant"
                   className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white rounded-lg hover:bg-white/[0.08] transition-colors cursor-pointer"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -258,31 +268,31 @@ export default function ChatAssistant() {
             {/* Main Content Area */}
             {messages.length === 0 ? (
               /* Initial Welcome State Matching Reference Screenshot */
-              <div className="flex-1 overflow-y-auto px-5 py-6 sm:py-7 flex flex-col items-center justify-center text-center">
+              <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 sm:py-4 flex flex-col items-center justify-center text-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {/* Centered Glass Energy Orb with Dark Circular Surround */}
-                <div className="mb-4 sm:mb-5">
+                <div className="mb-2 flex items-center justify-center">
                   <FloatingSphere isLoading={isLoading} />
                 </div>
 
                 {/* Centered Heading */}
-                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-2">
+                <h2 className="text-base sm:text-[17px] font-bold text-white tracking-tight mb-2">
                   Hey, I’m Noor’s AI twin 👋
                 </h2>
 
                 {/* Centered Muted Description */}
-                <p className="text-xs sm:text-sm text-slate-400 max-w-xs sm:max-w-sm mx-auto leading-relaxed mb-6">
+                <p className="text-xs sm:text-[13px] text-slate-400 max-w-[300px] mx-auto leading-relaxed mb-3">
                   Ask about my skills, projects, or leave a message — I read every one.
                 </p>
 
                 {/* 4 Centered Rounded Pill Question Buttons */}
-                <div className="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto">
+                <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-[330px] mx-auto">
                   {SUGGESTED_PROMPTS.map((prompt, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => handleSendMessage(prompt)}
                       disabled={isLoading}
-                      className="rounded-full px-4 py-2 text-xs sm:text-[13px] font-medium bg-[#13191C]/90 hover:bg-[#1A2328] border border-white/10 hover:border-[#C5F54A]/40 text-slate-200 hover:text-white transition-all shadow-xs hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50"
+                      className="rounded-full px-3 py-1 text-[10px] sm:text-[11px] font-medium bg-[#13191C]/75 hover:bg-[#1A2328] border border-white/10 hover:border-[#C5F54A]/40 text-slate-300 hover:text-white transition-all shadow-xs hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50"
                     >
                       {prompt}
                     </button>
@@ -291,7 +301,7 @@ export default function ChatAssistant() {
               </div>
             ) : (
               /* Active Conversation Stream */
-              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 max-h-[440px] text-sm scrollbar-thin">
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4 text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div className="flex items-center justify-center gap-2 py-1 text-slate-400 text-xs font-mono">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#C5F54A]"></span>
                   <span>Conversation with Noor’s AI twin</span>
@@ -335,6 +345,12 @@ export default function ChatAssistant() {
                       >
                         Try again ↺
                       </button>
+                      <a href="#projects" className="text-[11px] font-mono text-slate-300 hover:text-white hover:underline">
+                        Projects
+                      </a>
+                      <a href="#contact" className="text-[11px] font-mono text-slate-300 hover:text-white hover:underline">
+                        Contact
+                      </a>
                     </div>
                   </div>
                 )}
@@ -344,22 +360,28 @@ export default function ChatAssistant() {
             )}
 
             {/* Large Bottom Input Area with Thin Lime-Green Outline */}
-            <div className="p-4 sm:p-5 pt-2 bg-transparent shrink-0">
+            <div className="p-3 sm:p-4 pt-2 bg-transparent shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="relative flex items-center bg-[#0D1214] border border-[#C5F54A]/50 focus-within:border-[#C5F54A] focus-within:ring-1 focus-within:ring-[#C5F54A]/40 rounded-2xl p-1.5 sm:p-2 transition-all shadow-[0_0_20px_rgba(197,245,74,0.12)]"
+                className="relative flex items-end bg-[#0D1214]/85 border border-[#C5F54A]/75 focus-within:border-[#C5F54A] focus-within:ring-1 focus-within:ring-[#C5F54A]/40 rounded-2xl p-2 transition-all shadow-[0_0_20px_rgba(197,245,74,0.12)]"
               >
-                <input
+                <textarea
                   ref={inputRef}
-                  type="text"
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value)}
                   placeholder="Ask me anything..."
                   disabled={isLoading}
-                  className="flex-1 min-w-0 bg-transparent text-white placeholder-slate-500 text-xs sm:text-sm px-3.5 py-2 sm:py-2.5 focus:outline-none"
+                  rows={2}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  className="flex-1 min-w-0 resize-none bg-transparent text-white placeholder-slate-500 text-xs sm:text-sm px-1.5 py-1.5 focus:outline-none"
                 />
                 <button
                   type="submit"

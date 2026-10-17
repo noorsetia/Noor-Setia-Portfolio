@@ -14,9 +14,9 @@ export const personalInfo = {
     email: "mailto:noorsetia24@navgurukul.org"
   },
   about: {
-    whoIAm: "I'm Noor Setia, a BCA Software Development student and Full Stack MERN Developer focused on building practical, scalable, and user-focused web applications. My core development stack includes React, JavaScript, Node.js, Express.js, and MongoDB.",
-    whatIBuild: "I build complete web applications across the stack, from responsive React interfaces to REST APIs, authentication, database-driven features, dashboards, e-commerce workflows, payment integrations, and SaaS functionality.",
-    howIThink: "I approach development by breaking complex problems into smaller, manageable components and focusing on clean architecture, maintainability, performance, and scalability. Alongside full-stack development, I'm strengthening my Data Structures & Algorithms, System Design, and AI/ML fundamentals.",
+    whoIAm: "I'm Noor Setia, a BCA Software Development student and Full Stack MERN Developer. I focus on practical web applications built with React, JavaScript, Node.js, Express.js, and MongoDB.",
+    whatIBuild: "I build responsive React interfaces and data-driven features, then connect them to REST APIs and MongoDB-backed functionality. In NESTORA, that includes authentication, Zustand cart state, Mongoose models, and a Razorpay checkout workflow.",
+    howIThink: "I break complex features into smaller components, keep responsibilities clear, and debug from the data flow outward. I care about maintainable code and measured improvements, while continuing to strengthen Data Structures & Algorithms and System Design.",
     codeSnippet: {
       name: "Noor Setia",
       role: "Full Stack MERN Developer",

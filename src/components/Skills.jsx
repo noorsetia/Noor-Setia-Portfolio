@@ -1,59 +1,30 @@
 import React, { useState, useMemo } from 'react';
 import Reveal from './Reveal';
-import { skillsCategories } from '../data/skillsData';
+import { skills } from '../data/skillsData';
 
-// Verified project references for skills
-const skillProjectMap = {
-  'React.js': 'Nestora • CareSync',
-  'Node.js': 'Nestora • GYM',
-  'Express.js': 'Nestora • GYM',
-  'MongoDB': 'Nestora • GYM',
-  'Mongoose': 'Nestora • GYM',
-  'Tailwind CSS': 'Portfolio • CareSync',
-  'JavaScript': 'All Projects',
-  'Vite': 'Nestora • CareSync',
-  'REST APIs': 'Nestora • CareSync • GYM',
-  'JWT': 'Nestora Auth',
-  'Vercel': 'Nestora Deploy',
-  'Postman': 'API Testing',
-  'Git': 'Version Control',
-  'GitHub': 'Open Source'
-};
+const categories = ['All', 'Frontend', 'Backend', 'Databases', 'Tools & Platforms', 'Currently Learning'];
 
 export default function Skills() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const totalSkillCount = useMemo(() => {
-    return skillsCategories.reduce((acc, cat) => acc + cat.skills.length, 0);
+  const categoryCounts = useMemo(() => {
+    return categories.reduce((counts, category) => {
+      counts[category] = category === 'All'
+        ? skills.length
+        : skills.filter((skill) => skill.category === category).length;
+      return counts;
+    }, {});
   }, []);
-
-  const categories = useMemo(() => {
-    return [
-      { name: 'All', count: totalSkillCount },
-      ...skillsCategories.map(c => ({ name: c.category, count: c.skills.length }))
-    ];
-  }, [totalSkillCount]);
 
   const filteredSkills = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
-    
-    let result = [];
-    skillsCategories.forEach(group => {
-      if (selectedCategory === 'All' || group.category === selectedCategory) {
-        group.skills.forEach(skill => {
-          if (!query || skill.toLowerCase().includes(query)) {
-            result.push({
-              name: skill,
-              category: group.category,
-              projectTag: skillProjectMap[skill] || null
-            });
-          }
-        });
-      }
-    });
 
-    return result;
+    return skills.filter((skill) => {
+      const matchesCategory = selectedCategory === 'All' || skill.category === selectedCategory;
+      const searchableText = [skill.name, ...skill.aliases].join(' ').toLowerCase();
+      return matchesCategory && (!query || searchableText.includes(query));
+    });
   }, [selectedCategory, searchQuery]);
 
   return (
@@ -83,7 +54,7 @@ export default function Skills() {
               <input
                 id="skill-search"
                 type="text"
-                placeholder="Search tools & technologies..."
+                placeholder="Search technologies or aliases..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white dark:bg-[#101315] border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 pl-10 text-sm text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#C5F54A] focus:ring-1 focus:ring-[#C5F54A] transition-all shadow-sm"
@@ -118,25 +89,25 @@ export default function Skills() {
             role="tablist"
             aria-label="Filter skills by technical category"
           >
-            {categories.map((cat) => {
-              const isActive = selectedCategory === cat.name;
+            {categories.map((category) => {
+              const isActive = selectedCategory === category;
               return (
                 <button
-                  key={cat.name}
+                  key={category}
                   role="tab"
                   aria-selected={isActive}
-                  onClick={() => setSelectedCategory(cat.name)}
+                  onClick={() => setSelectedCategory(category)}
                   className={`inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A] ${
                     isActive
                       ? 'bg-[#C5F54A] text-slate-950 font-bold shadow-md shadow-[#C5F54A]/20'
                       : 'bg-white dark:bg-[#101315] text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161B1F] border border-slate-200 dark:border-white/[0.06] shadow-sm'
                   }`}
                 >
-                  <span>{cat.name}</span>
+                  <span>{category}</span>
                   <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
                     isActive ? 'bg-slate-950/20 text-slate-950 font-semibold' : 'bg-slate-100 dark:bg-white/[0.06] text-slate-500 dark:text-slate-400'
                   }`}>
-                    {cat.count}
+                    {categoryCounts[category]}
                   </span>
                 </button>
               );
@@ -157,24 +128,29 @@ export default function Skills() {
         {/* Skills Grid with Responsive Hover Depth & Project Association */}
         {filteredSkills.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5 sm:gap-4">
-            {filteredSkills.map((item, index) => (
+            {filteredSkills.map((item) => (
               <div 
-                key={`${item.name}-${index}`}
-                className="p-4 sm:p-4.5 rounded-xl bg-white dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] hover:border-[#C5F54A]/50 hover:bg-slate-50 dark:hover:bg-[#13171A] transition-all duration-200 flex flex-col justify-between min-h-[105px] group hover:-translate-y-1 shadow-sm relative overflow-hidden"
+                key={item.name}
+                className={`p-4 sm:p-4.5 rounded-xl bg-white dark:bg-[#101315] border border-slate-200 dark:border-white/[0.06] hover:border-[#C5F54A]/50 hover:bg-slate-50 dark:hover:bg-[#13171A] transition-colors duration-200 flex flex-col justify-between min-h-[105px] group relative overflow-hidden ${item.core ? 'ring-1 ring-[#C5F54A]/20' : ''}`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider leading-snug break-words">
-                    {item.category}
+                    {item.category === 'Currently Learning' ? 'Currently Learning' : item.category}
                   </span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#C5F54A] group-hover:scale-125 transition-transform shrink-0 mt-1" aria-hidden="true"></span>
                 </div>
                 
                 <div>
-                  <span className="text-xs sm:text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-[#C5F54A] transition-colors leading-snug block">
+                  <span className={`text-xs sm:text-sm md:text-base font-semibold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-[#C5F54A] transition-colors leading-snug block ${item.core ? 'text-sm sm:text-base md:text-lg' : ''}`}>
                     {item.name}
                   </span>
 
                   {/* Verified Project Association Tag if present */}
+                  {item.status === 'learning' && (
+                    <span className="mt-1 text-[10px] font-mono text-[#84a83a] dark:text-[#C5F54A]/80 block">
+                      Learning focus
+                    </span>
+                  )}
                   {item.projectTag && (
                     <span className="mt-1 text-[10px] font-mono text-slate-400 dark:text-slate-500 block truncate group-hover:text-[#C5F54A]/80 transition-colors">
                       {item.projectTag}

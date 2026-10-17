@@ -10,7 +10,117 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const isProduction = process.env.NODE_ENV === 'production';
 
-app.use(express.json());
+app.use(express.json({ limit: '16kb' }));
+
+const contactAttempts = new Map<string, number[]>();
+const CONTACT_WINDOW_MS = 15 * 60 * 1000;
+const CONTACT_MAX_ATTEMPTS = 5;
+const chatAttempts = new Map<string, number[]>();
+
+function getClientAddress(req: express.Request) {
+  return req.ip || req.socket.remoteAddress || 'unknown';
+}
+
+function isRateLimited(address: string) {
+  const now = Date.now();
+  const recentAttempts = (contactAttempts.get(address) || []).filter(
+    (timestamp) => now - timestamp < CONTACT_WINDOW_MS
+  );
+
+  if (recentAttempts.length >= CONTACT_MAX_ATTEMPTS) {
+    contactAttempts.set(address, recentAttempts);
+    return true;
+  }
+
+  recentAttempts.push(now);
+  contactAttempts.set(address, recentAttempts);
+  return false;
+}
+
+function isChatRateLimited(address: string) {
+  const now = Date.now();
+  const recentAttempts = (chatAttempts.get(address) || []).filter(
+    (timestamp) => now - timestamp < 60 * 1000
+  );
+
+  if (recentAttempts.length >= 12) {
+    chatAttempts.set(address, recentAttempts);
+    return true;
+  }
+
+  recentAttempts.push(now);
+  chatAttempts.set(address, recentAttempts);
+  return false;
+}
+
+app.post('/api/contact', async (req, res) => {
+  const address = getClientAddress(req);
+  if (isRateLimited(address)) {
+    return res.status(429).json({
+      error: 'Too many messages were submitted. Please try again later.',
+    });
+  }
+
+  const { name, email, subject, message, company } = req.body || {};
+  const cleanName = typeof name === 'string' ? name.trim() : '';
+  const cleanEmail = typeof email === 'string' ? email.trim() : '';
+  const cleanSubject = typeof subject === 'string' ? subject.trim() : '';
+  const cleanMessage = typeof message === 'string' ? message.trim() : '';
+
+  if (company) {
+    return res.status(400).json({ error: 'Unable to process this submission.' });
+  }
+
+  if (
+    !cleanName ||
+    cleanName.length > 100 ||
+    !cleanEmail ||
+    cleanEmail.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) ||
+    !cleanMessage ||
+    cleanMessage.length > 5000 ||
+    cleanSubject.length > 200
+  ) {
+    return res.status(400).json({ error: 'Please check the submitted fields and try again.' });
+  }
+
+  const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
+  if (!accessKey) {
+    return res.status(503).json({
+      error: 'The contact service is not configured yet. Please email Noor directly.',
+    });
+  }
+
+  try {
+    const providerResponse = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        access_key: accessKey,
+        name: cleanName,
+        email: cleanEmail,
+        subject: cleanSubject || `Portfolio contact from ${cleanName}`,
+        message: cleanMessage,
+      }),
+    });
+
+    const providerResult = await providerResponse.json().catch(() => null);
+    if (!providerResponse.ok || !providerResult?.success) {
+      return res.status(502).json({
+        error: 'The contact service could not accept your message. Please email Noor directly.',
+      });
+    }
+
+    return res.json({ success: true });
+  } catch {
+    return res.status(502).json({
+      error: 'The contact service is temporarily unavailable. Please email Noor directly.',
+    });
+  }
+});
 
 // System prompt grounding the AI assistant in Noor Setia's verified facts
 const SYSTEM_INSTRUCTION = `
@@ -34,11 +144,10 @@ VERIFIED FACTS ABOUT NOOR SETIA:
   * Senior Secondary (Class XII – Non-Medical), Singh Sabha Kanya Pathshala Sr. Sec. School, Abohar (Graduated 2024)
 - Professional Experience:
   * Full Stack Developer Intern at Vedonyx (2025)
-    - Developing full-stack web applications with React, Node.js, and Express.js.
-    - Building and integrating REST APIs for dynamic, database-driven functionality.
-    - Writing modular, reusable frontend components with JavaScript and React.
-    - Working with MongoDB for data modeling, queries, and CRUD operations.
-    - Collaborative development with Git and GitHub.
+    - Built reusable React and JavaScript components for full-stack web application workflows.
+    - Implemented and integrated Express.js REST APIs for database-driven functionality.
+    - Worked with MongoDB for data modeling, queries, and CRUD operations.
+    - Debugged frontend/backend issues and used Git-based collaboration workflows.
   * Hackathon & Innovation Facilitator at Navgurukul (Oct 2024 – Jul 2025)
     - Coordinated campus-level, central, and global hackathon initiatives end-to-end.
     - Supported participating teams from ideation through to working prototypes.
@@ -67,10 +176,11 @@ VERIFIED FACTS ABOUT NOOR SETIA:
      * Frontend Repo: https://github.com/noorsetia/GYM_MERN_Frontend
      * Backend Repo: https://github.com/noorsetia/GYM_Backend
 - Technical Skills:
-  * Frontend: React 18/19, JavaScript (ES6+), TypeScript, Tailwind CSS, Bootstrap, HTML5/CSS3, Zustand, Redux Toolkit
-  * Backend: Node.js, Express.js, RESTful APIs, Middleware, JWT, Google OAuth, Razorpay integration
-  * Databases: MongoDB, Mongoose ORM, JSON schema design
-  * Tools & Workflow: Git, GitHub, Vite, Postman, Vercel, Netlify, Render, ESLint
+  * Frontend: React.js, JavaScript (ES6+), HTML5, CSS3, Bootstrap, Tailwind CSS
+  * Backend: Node.js, Express.js, REST APIs, JWT, Middleware
+  * Databases: MongoDB, Mongoose, CRUD operations
+  * Tools & Platforms: Git, GitHub, VS Code, Postman, npm, Vite, Vercel, Netlify, Render
+  * Currently learning: AI/ML fundamentals, generative AI, data structures and algorithms, Python, problem solving, recursion, searching and sorting, system design, AWS
 
 When mentioning projects, format links as markdown links like [Project Name](url).
 Keep responses concise, clear, informative, and focused on engineering excellence.
@@ -87,6 +197,12 @@ app.get('/api/chat/status', (_req, res) => {
 
 // Chat endpoint
 app.post('/api/chat', async (req, res) => {
+  if (isChatRateLimited(getClientAddress(req))) {
+    return res.status(429).json({
+      error: 'The assistant is receiving many requests. Please wait a moment and try again.',
+    });
+  }
+
   try {
     const { message, history } = req.body;
 
@@ -97,7 +213,7 @@ app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return res.status(503).json({
-        error: 'AI assistant is currently offline because GEMINI_API_KEY is not configured in the server environment.',
+        error: 'The AI assistant is temporarily unavailable. Please explore the portfolio or contact Noor directly.',
         configured: false,
       });
     }
@@ -107,11 +223,15 @@ app.post('/api/chat', async (req, res) => {
     // Format chat history if provided
     const contents = [];
     if (Array.isArray(history)) {
-      for (const h of history) {
-        if (h.role === 'user' || h.role === 'model') {
+      for (const h of history.slice(-12)) {
+        if (
+          (h.role === 'user' || h.role === 'model') &&
+          typeof h.content === 'string' &&
+          h.content.length <= 2000
+        ) {
           contents.push({
             role: h.role,
-            parts: [{ text: h.content }],
+            parts: [{ text: h.content.trim() }],
           });
         }
       }
@@ -131,7 +251,9 @@ app.post('/api/chat', async (req, res) => {
       },
     });
 
-    const reply = response.text || "I'm here to help with any questions about Noor's skills and projects!";
+    const reply = typeof response.text === 'string' && response.text.trim()
+      ? response.text.trim()
+      : "I’m here to help with questions about Noor’s skills, projects, education, and experience.";
     res.json({ reply, configured: true });
   } catch (err: any) {
     const rawError = err?.message || String(err);
@@ -167,7 +289,7 @@ async function startServer() {
   } else {
     const distPath = path.resolve(__dirname, 'dist');
     app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
+    app.get('/*splat', (_req, res) => {
       res.sendFile(path.resolve(distPath, 'index.html'));
     });
   }

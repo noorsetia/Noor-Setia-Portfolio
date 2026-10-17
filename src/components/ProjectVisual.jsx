@@ -23,6 +23,10 @@ export default function ProjectVisual({ project, className = "", isModal = false
           src={project.screenshotUrl}
           alt={`Interface screenshot of ${project.title}`}
           onError={() => setImageError(true)}
+          loading={isModal ? 'eager' : 'lazy'}
+          decoding="async"
+          width="1280"
+          height="800"
           className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-80 pointer-events-none" />
@@ -117,7 +121,9 @@ export default function ProjectVisual({ project, className = "", isModal = false
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
           Razorpay Gateway • Google OAuth • Zustand
         </span>
-        <span className="text-[#C5F54A] font-semibold shrink-0 ml-1">Live App ↗</span>
+        <span className="text-[#C5F54A] font-semibold shrink-0 ml-1">
+          {project.screenshotUrl ? 'Live Preview ↗' : 'Illustrative ↗'}
+        </span>
       </div>
     </div>
   );
@@ -173,7 +179,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-2 border-t border-white/[0.08] text-[10px] font-mono text-slate-400">
-        <span className="text-slate-300 truncate">React Router • Form Validation • Bootstrap CSS</span>
+        <span className="text-slate-300 truncate">React Router • Form Validation • CSS3</span>
         <span className="text-[#C5F54A] font-semibold shrink-0 ml-1">Live App ↗</span>
       </div>
     </div>
@@ -327,7 +333,9 @@ export default function ProjectVisual({ project, className = "", isModal = false
           {project.id === 3 && "JavaScript (ES6+) • Chart.js • Real-time Filter"}
           {project.id === 4 && "MERN Stack • Health Metrics Engine • REST APIs"}
         </span>
-        <span className="text-[#C5F54A] font-semibold shrink-0 ml-2">Verified Specs</span>
+        <span className="text-[#C5F54A] font-semibold shrink-0 ml-2">
+          {project.screenshotUrl ? 'Verified Specs' : 'Illustrative preview'}
+        </span>
       </div>
     </div>
   );
@@ -342,7 +350,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
             onClick={() => setActiveTab('preview')}
             className={`px-2.5 py-1 rounded transition-colors ${activeTab === 'preview' ? 'bg-[#C5F54A] text-slate-950 font-bold' : 'text-slate-400 hover:text-white'}`}
           >
-            Live Preview
+            {project.screenshotUrl ? 'Live Preview' : 'Illustration'}
           </button>
           <button
             type="button"
@@ -359,6 +367,11 @@ export default function ProjectVisual({ project, className = "", isModal = false
         renderArchitectureBlueprint()
       ) : (
         <>
+          {!project.screenshotUrl && (
+            <span className="absolute top-3 left-3 z-10 rounded-md border border-white/15 bg-slate-950/80 px-2 py-1 text-[10px] font-mono font-semibold text-slate-300 backdrop-blur-sm">
+              Illustrative preview
+            </span>
+          )}
           {project.id === 1 && renderNestoraPreview()}
           {project.id === 2 && renderCareSyncPreview()}
           {project.id === 3 && renderWorldVisualPreview()}

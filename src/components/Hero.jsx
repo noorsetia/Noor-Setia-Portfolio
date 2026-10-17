@@ -4,22 +4,22 @@ import myProfileImg from '../assets/profile.jpg';
 import { personalInfo } from '../data/personalInfo';
 
 const rotatingKeywords = [
-  'clean architecture.',
-  'robust REST APIs.',
-  'scalable MERN stacks.',
-  'modern React systems.',
-  'AI / ML fundamentals.'
+  'scalable web apps',
+  'clean REST APIs',
+  'delightful UIs',
+  'MERN products'
 ];
 
 export default function Hero({ onOpenCommandPalette }) {
   const [keywordIndex, setKeywordIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
-  const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
   const [isCardHovered, setIsCardHovered] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const cardRef = useRef(null);
+  const cardGlareRef = useRef(null);
   const heroRef = useRef(null);
   const glowRef = useRef(null);
+  const ctaStageRef = useRef(null);
 
   // Interactive Cursor-Following Lime-Yellow Background Glow
   useEffect(() => {
@@ -110,20 +110,108 @@ export default function Hero({ onOpenCommandPalette }) {
     };
   }, []);
 
+  // Subtle desktop-only depth response for the hero CTA group.
+  useEffect(() => {
+    const ctaStageEl = ctaStageRef.current;
+    if (!ctaStageEl) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+    if (prefersReducedMotion || isTouchDevice) return;
+
+    const current = { x: 0, y: 0, z: 0, rotateX: 0, rotateY: 0 };
+    const target = { ...current };
+    let rafId = null;
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+    const setCtaDepth = () => {
+      ctaStageEl.style.setProperty('--cta-x', `${current.x.toFixed(2)}px`);
+      ctaStageEl.style.setProperty('--cta-y', `${current.y.toFixed(2)}px`);
+      ctaStageEl.style.setProperty('--cta-z', `${current.z.toFixed(2)}px`);
+      ctaStageEl.style.setProperty('--cta-rotate-x', `${current.rotateX.toFixed(2)}deg`);
+      ctaStageEl.style.setProperty('--cta-rotate-y', `${current.rotateY.toFixed(2)}deg`);
+    };
+
+    const animateCtaDepth = () => {
+      const ease = 0.12;
+      current.x += (target.x - current.x) * ease;
+      current.y += (target.y - current.y) * ease;
+      current.z += (target.z - current.z) * ease;
+      current.rotateX += (target.rotateX - current.rotateX) * ease;
+      current.rotateY += (target.rotateY - current.rotateY) * ease;
+      setCtaDepth();
+
+      const settled = Math.max(
+        Math.abs(target.x - current.x),
+        Math.abs(target.y - current.y),
+        Math.abs(target.z - current.z),
+        Math.abs(target.rotateX - current.rotateX),
+        Math.abs(target.rotateY - current.rotateY)
+      ) < 0.02;
+
+      if (!settled) {
+        rafId = requestAnimationFrame(animateCtaDepth);
+      } else {
+        rafId = null;
+      }
+    };
+
+    const updateCtaDepth = (event) => {
+      if (event.pointerType && event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+
+      const rect = ctaStageEl.getBoundingClientRect();
+      const relativeX = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+      const relativeY = clamp((event.clientY - rect.top) / rect.height, 0, 1);
+      const horizontal = clamp((relativeX - 0.5) * 2, -1, 1);
+      const vertical = clamp((relativeY - 0.5) * 2, -1, 1);
+      const depth = (1 - Math.max(Math.abs(horizontal), Math.abs(vertical))) * 5;
+
+      target.x = horizontal * 7;
+      target.y = vertical * 5;
+      target.z = depth;
+      target.rotateX = vertical * -3;
+      target.rotateY = horizontal * 3;
+      if (!rafId) rafId = requestAnimationFrame(animateCtaDepth);
+    };
+
+    const resetCtaDepth = () => {
+      target.x = 0;
+      target.y = 0;
+      target.z = 0;
+      target.rotateX = 0;
+      target.rotateY = 0;
+      if (!rafId) rafId = requestAnimationFrame(animateCtaDepth);
+    };
+
+    ctaStageEl.addEventListener('pointermove', updateCtaDepth, { passive: true });
+    ctaStageEl.addEventListener('pointerleave', resetCtaDepth, { passive: true });
+
+    return () => {
+      ctaStageEl.removeEventListener('pointermove', updateCtaDepth);
+      ctaStageEl.removeEventListener('pointerleave', resetCtaDepth);
+      resetCtaDepth();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   // Cycling keyword timer
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
+    let fadeTimeout;
     const interval = setInterval(() => {
       setIsFading(true);
-      setTimeout(() => {
+      fadeTimeout = setTimeout(() => {
         setKeywordIndex((prev) => (prev + 1) % rotatingKeywords.length);
         setIsFading(false);
       }, 300);
     }, 3200);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(fadeTimeout);
+    };
   }, []);
 
   // 3D Card Tilt handler
@@ -132,12 +220,19 @@ export default function Hero({ onOpenCommandPalette }) {
     const rect = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setCardTilt({ x: x * 10, y: -y * 10 });
-    setIsCardHovered(true);
+    const tiltX = x * 10;
+    const tiltY = -y * 10;
+    cardRef.current.style.transform = `perspective(1000px) rotateY(${tiltX}deg) rotateX(${tiltY}deg)`;
+    if (cardGlareRef.current) {
+      cardGlareRef.current.style.background = `radial-gradient(circle 300px at ${50 + tiltX * 4}% ${50 - tiltY * 4}%, rgba(197, 245, 74, 0.15), transparent 70%)`;
+    }
+    if (!isCardHovered) setIsCardHovered(true);
   };
 
   const handleCardMouseLeave = () => {
-    setCardTilt({ x: 0, y: 0 });
+    if (cardRef.current) {
+      cardRef.current.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+    }
     setIsCardHovered(false);
   };
 
@@ -223,7 +318,7 @@ export default function Hero({ onOpenCommandPalette }) {
             {/* Prominent Name as Main Visual Focus */}
             <Reveal direction="up" delay={120}>
               <div className="mb-2 sm:mb-3">
-                <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] font-black text-slate-900 dark:text-white tracking-tight leading-[1.02] drop-shadow-sm">
+                <h1 className="hero-name text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] font-black text-slate-900 dark:text-white tracking-tight leading-[1.02] drop-shadow-sm">
                   <span>{personalInfo.name}</span>
                   <span className="text-[#C5F54A] font-black inline-block ml-1 select-none">.</span>
                 </h1>
@@ -232,11 +327,11 @@ export default function Hero({ onOpenCommandPalette }) {
 
             {/* Headline with Dynamic Keyword Switcher */}
             <Reveal direction="up" delay={200}>
-              <h2 className="text-2xl sm:text-3xl lg:text-[2.25rem] font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-[1.2] sm:leading-[1.18] mb-3 text-balance">
-                <span>Building scalable web apps with </span>
-                <span className="inline-block relative text-[#C5F54A] min-w-[240px] sm:min-w-[320px]">
+              <h2 className="hero-headline max-w-full text-2xl sm:text-3xl lg:text-[2.25rem] font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-[1.2] sm:leading-[1.18] mb-3 text-balance">
+                <span>Building </span>
+                <span className="hero-keyword-slot inline-block relative">
                   <span 
-                    className={`inline-block transition-all duration-300 transform ${
+                    className={`hero-keyword inline-block transition-all duration-300 transform ${
                       isFading ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
                     }`}
                   >
@@ -257,31 +352,35 @@ export default function Hero({ onOpenCommandPalette }) {
                 <span className="text-slate-700 dark:text-slate-300 font-medium">{personalInfo.roleStack}</span>
               </div>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mb-7 leading-relaxed max-w-xl">
-                BCA Software Development student engineering robust, production-grade applications with React, modular Express.js REST APIs, performant state workflows, and structured MongoDB schemas.
+                {personalInfo.bio}
               </p>
             </Reveal>
 
             <Reveal direction="up" delay={350}>
               {/* Primary & Secondary CTA Hierarchy */}
-              <div className="flex flex-wrap items-center gap-3 mb-7 w-full sm:w-auto">
+              <div ref={ctaStageRef} className="hero-cta-stage flex max-w-full flex-wrap items-center gap-3 mb-7 w-full sm:w-auto">
                 {/* Primary CTA with Neon Lime Glow */}
-                <a
-                  href="#projects"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#C5F54A] hover:bg-[#D4F76E] text-slate-950 font-bold text-sm rounded-xl transition-all shadow-lg shadow-[#C5F54A]/25 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
-                >
-                  <span>Explore Featured Work</span>
-                  <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </a>
+                <span className="hero-cta-float-primary inline-flex">
+                  <a
+                    href="#projects"
+                    className="hero-cta-depth inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#C5F54A] hover:bg-[#D4F76E] text-slate-950 font-bold text-sm rounded-xl transition-all shadow-lg shadow-[#C5F54A]/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
+                  >
+                    <span>Explore Featured Work</span>
+                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </a>
+                </span>
 
                 {/* Secondary CTA */}
-                <a
-                  href="#contact"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-white dark:bg-[#12171A] hover:bg-slate-100 dark:hover:bg-[#161C20] border border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/20 text-slate-800 dark:text-slate-200 font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
-                >
-                  Contact Me
-                </a>
+                <span className="hero-cta-float-secondary inline-flex">
+                  <a
+                    href="#contact"
+                    className="hero-cta-depth inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-white dark:bg-[#12171A] hover:bg-slate-100 dark:hover:bg-[#161C20] border border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/20 text-slate-800 dark:text-slate-200 font-semibold text-sm rounded-xl transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F54A]"
+                  >
+                    Contact Me
+                  </a>
+                </span>
 
                 {/* Tertiary Resume CTA */}
                 {personalInfo.resumeUrl && (
@@ -306,7 +405,7 @@ export default function Hero({ onOpenCommandPalette }) {
                   href={personalInfo.socialLinks.github} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hero-social-link hover:text-blue-600 dark:hover:text-[#C5F54A] transition-all hover:-translate-y-0.5"
                 >
                   GitHub
                 </a>
@@ -315,7 +414,7 @@ export default function Hero({ onOpenCommandPalette }) {
                   href={personalInfo.socialLinks.linkedin} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hero-social-link hover:text-blue-600 dark:hover:text-[#C5F54A] transition-all hover:-translate-y-0.5"
                 >
                   LinkedIn
                 </a>
@@ -350,18 +449,15 @@ export default function Hero({ onOpenCommandPalette }) {
                 onMouseMove={handleCardMouseMove}
                 onMouseLeave={handleCardMouseLeave}
                 style={{
-                  transform: `perspective(1000px) rotateY(${cardTilt.x}deg) rotateX(${cardTilt.y}deg)`,
                   transition: isCardHovered ? 'none' : 'transform 0.5s ease-out'
                 }}
                 className="relative rounded-2xl bg-white dark:bg-[#101315] border border-slate-200 dark:border-white/[0.08] hover:border-slate-300 dark:hover:border-[#C5F54A]/30 p-5 sm:p-6 shadow-xl dark:shadow-2xl dark:shadow-black/70 overflow-hidden group transform-gpu transition-colors"
               >
                 {/* Dynamic Specular Glare following mouse */}
                 {isCardHovered && (
-                  <div 
+                  <div
+                    ref={cardGlareRef}
                     className="absolute inset-0 pointer-events-none rounded-2xl opacity-40 transition-opacity"
-                    style={{
-                      background: `radial-gradient(circle 300px at ${50 + cardTilt.x * 4}% ${50 - cardTilt.y * 4}%, rgba(197, 245, 74, 0.15), transparent 70%)`
-                    }}
                     aria-hidden="true"
                   />
                 )}

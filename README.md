@@ -25,7 +25,15 @@ A sleek, modern, and highly interactive developer portfolio built with React and
 Follow these steps to run the project locally on your machine.
 
 ### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed.
+Make sure you have [Node.js](https://nodejs.org/) 22.23.3 installed. This project uses Vite 7, whose locked dependency requires Node.js `^20.19.0 || >=22.12.0`.
+
+If you use NVM:
+```bash
+nvm install
+nvm use
+```
+
+The repository includes `.nvmrc` so interactive shells can select the project runtime automatically. Non-interactive task shells may not load NVM; verify with `node -v` and run `source "$NVM_DIR/nvm.sh" && nvm use` before building when necessary.
 
 ### Installation
 
@@ -48,10 +56,9 @@ Make sure you have [Node.js](https://nodejs.org/) installed.
 ## ⚙️ Configuration & Personalization
 
 1. Activating the Contact Form
-To make sure the contact form sends emails to your own inbox:
-Go toWeb3Forms and generate a free access key using your email.
-Open src/components/Contact.jsx.
-Locate the handleSubmit function and replace "YOUR_ACCESS_KEY_HERE" with your actual key.
+The form submits through the server-side `/api/contact` route and forwards messages to Web3Forms.
+Copy `.env.example` to `.env` and set `WEB3FORMS_ACCESS_KEY` to the server-only key generated for the intended recipient.
+Never place the Web3Forms key in `src/` or expose it through a `VITE_*` variable.
 2. Updating Resume Link
 Place your actual resume PDF in the public folder and name it resume.pdf.
 The "Resume" button in the Navbar/Footer will automatically link to it.

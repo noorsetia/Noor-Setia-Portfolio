@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Reveal from './Reveal';
 import { personalInfo } from '../data/personalInfo';
 
@@ -8,11 +8,12 @@ export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState('');
+  const submissionInFlightRef = useRef(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+    if (errors[name] || errors.submit) setErrors((prev) => ({ ...prev, [name]: '', submit: '' }));
   };
 
   const copyToClipboard = async (text, label) => {
@@ -50,6 +51,7 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submissionInFlightRef.current) return;
     const validationErrors = validate();
     
     if (Object.keys(validationErrors).length > 0) {
@@ -57,35 +59,45 @@ export default function Contact() {
       return;
     }
 
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+    if (!accessKey) {
+      setErrors({ submit: 'The contact form is not configured yet. Please email Noor directly.' });
+      return;
+    }
+
+    submissionInFlightRef.current = true;
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
+          access_key: accessKey,
           name: formData.name.trim(),
           email: formData.email.trim(),
-          subject: formData.subject.trim(),
+          subject: formData.subject.trim() || `Portfolio contact from ${formData.name.trim()}`,
           message: formData.message.trim(),
+          botcheck: false,
         }),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => null);
 
-      if (response.ok && result.success) {
+      if (response.ok && result?.success === true) {
         setIsSubmitted(true);
         setFormData({ name: '', email: '', subject: '', message: '' });
         setErrors({});
       } else {
-        setErrors({ submit: result.error || "Unable to send your message. Please email directly." });
+        setErrors({ submit: result?.message || result?.body?.message || "Unable to send your message. Please email directly." });
       }
     } catch {
       setErrors({ submit: "The contact service is unavailable. Your message is still here, so please retry or email directly." });
     } finally {
+      submissionInFlightRef.current = false;
       setIsSubmitting(false);
     }
   };

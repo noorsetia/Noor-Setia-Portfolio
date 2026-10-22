@@ -55,14 +55,25 @@ The repository includes `.nvmrc` so interactive shells can select the project ru
 
 ## ⚙️ Configuration & Personalization
 
-1. Activating the Contact Form
-The form submits through the server-side `/api/contact` route and forwards messages to Web3Forms.
-Copy `.env.example` to `.env` and set `WEB3FORMS_ACCESS_KEY` to the server-only key generated for the intended recipient.
-Never place the Web3Forms key in `src/` or expose it through a `VITE_*` variable.
-2. Updating Resume Link
+### Deploying the portfolio and chat on Vercel
+
+The Vite site is built as static files in `dist`. Vercel deploys the chat endpoints separately from the `api/` serverless functions; `server.ts` is only the local Express development server and is not deployed automatically. The browser calls same-origin `/api/chat/status` and `/api/chat` endpoints.
+
+In the Vercel project, set server-side `GEMINI_API_KEY` and build-time `VITE_WEB3FORMS_ACCESS_KEY` for Production (and Preview/Development if needed), then redeploy. Do not create a `VITE_GEMINI_API_KEY` variable. The deployed status endpoint reports whether the Gemini key is present; it does not validate the key with Google until a chat request is made. The assistant uses the `gemini-3.8-flash` model through the `@google/genai` SDK.
+
+For local Express development, copy `.env.example` to `.env` and fill in the values. `GEMINI_API_KEY` is read only by the server. The contact form uses `VITE_WEB3FORMS_ACCESS_KEY` to call Web3Forms from the browser. Vite includes every `VITE_` value in the public JavaScript bundle; this key is intentionally public, and must never be used for Gemini or any credential that needs to remain secret.
+
+### Activating the Contact Form
+
+The form submits directly to the official `https://api.web3forms.com/submit` endpoint using `VITE_WEB3FORMS_ACCESS_KEY` for the configured portfolio form. Keep the form's Website URL set to the deployed portfolio origin. This avoids duplicate submissions and Web3Forms' restrictions on server-side requests. A successful API response confirms Web3Forms accepted the submission; check the Web3Forms Submissions dashboard or recipient inbox to confirm delivery.
+
+### Updating Resume Link
+
 Place your actual resume PDF in the public folder and name it resume.pdf.
 The "Resume" button in the Navbar/Footer will automatically link to it.
-3. Updating Social Links
+
+### Updating Social Links
+
 Open src/components/Hero.jsx and src/components/Footer.jsx and replace YOUR_GITHUB_USERNAME and YOUR_LINKEDIN_USERNAME with your real social media handles.
 
 

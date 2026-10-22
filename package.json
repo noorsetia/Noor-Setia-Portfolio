@@ -7,8 +7,8 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
-    "dev": "tsx server.ts",
-    "start": "tsx server.ts",
+    "dev": "node --env-file-if-exists=.env --import tsx server.ts",
+    "start": "node --env-file-if-exists=.env --import tsx server.ts",
     "check:node": "node scripts/check-node-version.mjs",
     "predev": "npm run check:node",
     "prebuild": "npm run check:node",

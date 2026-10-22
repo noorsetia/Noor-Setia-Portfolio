@@ -59,9 +59,9 @@ The repository includes `.nvmrc` so interactive shells can select the project ru
 
 The Vite site is built as static files in `dist`. Vercel deploys the chat endpoints separately from the `api/` serverless functions; `server.ts` is only the local Express development server and is not deployed automatically. The browser calls same-origin `/api/chat/status` and `/api/chat` endpoints.
 
-In the Vercel project, set server-side `GEMINI_API_KEY` and build-time `VITE_WEB3FORMS_ACCESS_KEY` for Production (and Preview/Development if needed), then redeploy. Do not create a `VITE_GEMINI_API_KEY` variable. The deployed status endpoint reports whether the Gemini key is present; it does not validate the key with Google until a chat request is made. The assistant uses the `gemini-3.8-flash` model through the `@google/genai` SDK.
+In the Vercel project, set server-side `GROQ_API_KEY` and build-time `VITE_WEB3FORMS_ACCESS_KEY` for Production (and Preview/Development if needed), then redeploy. Add `GROQ_API_KEY` under **Project Settings → Environment Variables**, select the Production environment (and Preview/Development if needed), and redeploy the latest deployment. Never create a `VITE_GROQ_API_KEY` variable. The status endpoint reports whether the server key is present; it does not validate the key until a chat request is made. The assistant calls Groq's `https://api.groq.com/openai/v1/chat/completions` endpoint with the production model `openai/gpt-oss-20b`.
 
-For local Express development, copy `.env.example` to `.env` and fill in the values. `GEMINI_API_KEY` is read only by the server. The contact form uses `VITE_WEB3FORMS_ACCESS_KEY` to call Web3Forms from the browser. Vite includes every `VITE_` value in the public JavaScript bundle; this key is intentionally public, and must never be used for Gemini or any credential that needs to remain secret.
+For local Express development, copy `.env.example` to `.env` and fill in the values. `GROQ_API_KEY` is read only by the server. The contact form uses `VITE_WEB3FORMS_ACCESS_KEY` to call Web3Forms from the browser. Vite includes every `VITE_` value in the public JavaScript bundle; this key is intentionally public, and must never be used for Groq or any credential that needs to remain secret.
 
 ### Activating the Contact Form
 

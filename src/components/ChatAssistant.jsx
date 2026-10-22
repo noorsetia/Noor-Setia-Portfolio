@@ -28,12 +28,26 @@ export default function ChatAssistant() {
 
   // Check backend AI configuration status on mount
   useEffect(() => {
-    fetch('/api/chat/status')
-      .then(res => res.json())
+    fetch('/api/chat/status', { headers: { Accept: 'application/json' } })
+      .then(res => res.json().then(data => ({ ok: res.ok, data })))
       .then(data => {
-        setIsConfigured(Boolean(data.configured));
+        if (!data.ok && import.meta.env.DEV) {
+          console.warn('[Ask Noor] status request failed', {
+            endpoint: '/api/chat/status',
+            configured: Boolean(data.data?.configured),
+            error: typeof data.data?.error === 'string' ? data.data.error : 'No JSON error provided',
+          });
+        }
+        setIsConfigured(Boolean(data.ok && data.data.configured));
       })
-      .catch(() => {
+      .catch((error) => {
+        if (import.meta.env.DEV) {
+          console.warn('[Ask Noor] status request could not reach the API', {
+            endpoint: '/api/chat/status',
+            name: error?.name || 'Error',
+            message: error?.message || 'Unknown network error',
+          });
+        }
         setIsConfigured(false);
       });
   }, []);
@@ -95,7 +109,7 @@ export default function ChatAssistant() {
         signal: controller.signal,
         body: JSON.stringify({
           message: text,
-          history: messages.map(m => ({
+          history: messages.slice(-12).map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: m.content
           }))
@@ -106,11 +120,29 @@ export default function ChatAssistant() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
+        if (import.meta.env.DEV) {
+          console.warn('[Ask Noor] chat request failed', {
+            endpoint: '/api/chat',
+            status: response.status,
+            configured: data.configured,
+            error: typeof data.error === 'string' ? data.error : 'No JSON error provided',
+          });
+        }
         if (data.configured === false) {
           setIsConfigured(false);
           throw new Error("I’m having trouble connecting right now. You can explore Noor’s projects or contact Noor directly.");
         }
+        if (response.status === 429) {
+          throw new Error(data.error || 'The assistant is busy. Please wait a moment and try again.');
+        }
+        if (response.status === 400) {
+          throw new Error(data.error || 'Please shorten your message and try again.');
+        }
         throw new Error('I couldn’t get a response right now. Please try again.');
+      }
+
+      if (typeof data.reply !== 'string' || !data.reply.trim()) {
+        throw new Error('The assistant returned an invalid response. Please try again.');
       }
 
       messageCounterRef.current += 1;
@@ -123,9 +155,18 @@ export default function ChatAssistant() {
         }
       ]);
     } catch (err) {
+      if (import.meta.env.DEV) {
+        console.warn('[Ask Noor] chat request could not complete', {
+          endpoint: '/api/chat',
+          name: err?.name || 'Error',
+          message: err?.message || 'Unknown network error',
+        });
+      }
       const message = err?.name === 'AbortError'
         ? 'The response took too long. Please try again.'
-        : 'I’m having trouble connecting right now. You can explore Noor’s projects or contact Noor directly.';
+        : (err instanceof Error && err.message !== 'Failed to fetch'
+          ? err.message
+          : 'I’m having trouble connecting right now. You can explore Noor’s projects or contact Noor directly.');
       setErrorMsg(message);
       setInputValue(text);
     } finally {
@@ -313,7 +354,7 @@ export default function ChatAssistant() {
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed break-words [overflow-wrap:anywhere] ${
+                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed break-words whitespace-pre-wrap [overflow-wrap:anywhere] ${
                         msg.role === 'user'
                           ? 'bg-[#C5F54A] text-slate-950 font-medium rounded-br-xs shadow-md shadow-[#C5F54A]/10'
                           : 'bg-[#13191C] text-slate-200 border border-white/[0.08] rounded-bl-xs shadow-md shadow-black/40'

@@ -17,13 +17,14 @@ export default function ChatAssistant() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
-  const [errorMsg, setErrorMsg] = useState(null);
   const [launcherImageFailed, setLauncherImageFailed] = useState(false);
   
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
   const dialogRef = useRef(null);
   const lastPromptRef = useRef('');
+  const lastUserMessageIdRef = useRef(null);
+  const requestInFlightRef = useRef(false);
   const messageCounterRef = useRef(0);
 
   // Check backend AI configuration status on mount
@@ -54,8 +55,9 @@ export default function ChatAssistant() {
 
   // Auto-scroll to bottom of chat
   useEffect(() => {
-    if (isOpen && messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (isOpen && container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
     }
   }, [messages, isOpen, isLoading]);
 
@@ -79,12 +81,21 @@ export default function ChatAssistant() {
   }, [isOpen]);
 
   const handleSendMessage = async (textToSend, { appendUserMessage = true } = {}) => {
-    const text = (textToSend || inputValue).trim();
-    if (!text || isLoading) return;
+    const text = (typeof textToSend === 'string' ? textToSend : inputValue).trim();
+    if (!text || requestInFlightRef.current || isLoading) return;
 
-    lastPromptRef.current = text;
-    if (appendUserMessage) setInputValue('');
-    setErrorMsg(null);
+    requestInFlightRef.current = true;
+    setInputValue('');
+    if (appendUserMessage) lastPromptRef.current = text;
+
+    const history = messages
+      .filter(message => message.role === 'user' || message.role === 'assistant')
+      .filter(message => appendUserMessage || message.id !== lastUserMessageIdRef.current)
+      .slice(-12)
+      .map(message => ({
+        role: message.role === 'assistant' ? 'model' : 'user',
+        content: message.content,
+      }));
 
     if (appendUserMessage) {
       messageCounterRef.current += 1;
@@ -93,7 +104,10 @@ export default function ChatAssistant() {
         content: text,
         id: `user-${messageCounterRef.current}`
       };
-      setMessages(prev => [...prev, userMessage]);
+      lastUserMessageIdRef.current = userMessage.id;
+      setMessages(prev => [...prev.filter(message => message.role !== 'system'), userMessage]);
+    } else {
+      setMessages(prev => prev.filter(message => message.role !== 'system'));
     }
     setIsLoading(true);
 
@@ -109,10 +123,7 @@ export default function ChatAssistant() {
         signal: controller.signal,
         body: JSON.stringify({
           message: text,
-          history: messages.slice(-12).map(m => ({
-            role: m.role === 'assistant' ? 'model' : 'user',
-            content: m.content
-          }))
+          history,
         })
       });
 
@@ -167,10 +178,14 @@ export default function ChatAssistant() {
         : (err instanceof Error && err.message !== 'Failed to fetch'
           ? err.message
           : 'I’m having trouble connecting right now. You can explore Noor’s projects or contact Noor directly.');
-      setErrorMsg(message);
-      setInputValue(text);
+      messageCounterRef.current += 1;
+      setMessages(prev => [
+        ...prev.filter(item => item.role !== 'system'),
+        { role: 'system', content: message, id: `error-${messageCounterRef.current}` },
+      ]);
     } finally {
       window.clearTimeout(timeout);
+      requestInFlightRef.current = false;
       setIsLoading(false);
     }
   };
@@ -342,7 +357,7 @@ export default function ChatAssistant() {
               </div>
             ) : (
               /* Active Conversation Stream */
-              <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4 text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4 text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div className="flex items-center justify-center gap-2 py-1 text-slate-400 text-xs font-mono">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#C5F54A]"></span>
                   <span>Conversation with Noor’s AI twin</span>
@@ -354,13 +369,36 @@ export default function ChatAssistant() {
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
+                      role={msg.role === 'system' ? 'alert' : undefined}
                       className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed break-words whitespace-pre-wrap [overflow-wrap:anywhere] ${
                         msg.role === 'user'
                           ? 'bg-[#C5F54A] text-slate-950 font-medium rounded-br-xs shadow-md shadow-[#C5F54A]/10'
-                          : 'bg-[#13191C] text-slate-200 border border-white/[0.08] rounded-bl-xs shadow-md shadow-black/40'
+                          : msg.role === 'system'
+                            ? 'bg-red-950/30 text-red-200 border border-red-500/30 rounded-bl-xs shadow-md shadow-black/40'
+                            : 'bg-[#13191C] text-slate-200 border border-white/[0.08] rounded-bl-xs shadow-md shadow-black/40'
                       }`}
                     >
-                      {renderFormattedContent(msg.content)}
+                      {msg.role === 'system' ? (
+                        <div className="space-y-2">
+                          <p>{msg.content}</p>
+                          <div className="flex items-center gap-2 pt-1 border-t border-red-500/20">
+                            <button
+                              type="button"
+                              onClick={handleRetry}
+                              disabled={isLoading}
+                              className="text-[11px] font-mono text-[#C5F54A] hover:underline font-semibold cursor-pointer disabled:opacity-50"
+                            >
+                              Try again ↺
+                            </button>
+                            <a href="#projects" className="text-[11px] font-mono text-slate-300 hover:text-white hover:underline">
+                              Projects
+                            </a>
+                            <a href="#contact" className="text-[11px] font-mono text-slate-300 hover:text-white hover:underline">
+                              Contact
+                            </a>
+                          </div>
+                        </div>
+                      ) : renderFormattedContent(msg.content)}
                     </div>
                   </div>
                 ))}
@@ -375,28 +413,6 @@ export default function ChatAssistant() {
                   </div>
                 )}
 
-                {errorMsg && (
-                  <div className="p-3.5 bg-red-950/30 border border-red-500/30 rounded-xl text-xs text-red-200 space-y-2">
-                    <p className="leading-relaxed">{errorMsg}</p>
-                    <div className="flex items-center gap-2 pt-1 border-t border-red-500/20">
-                      <button
-                        type="button"
-                        onClick={handleRetry}
-                        className="text-[11px] font-mono text-[#C5F54A] hover:underline font-semibold cursor-pointer"
-                      >
-                        Try again ↺
-                      </button>
-                      <a href="#projects" className="text-[11px] font-mono text-slate-300 hover:text-white hover:underline">
-                        Projects
-                      </a>
-                      <a href="#contact" className="text-[11px] font-mono text-slate-300 hover:text-white hover:underline">
-                        Contact
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                <div ref={messagesEndRef} />
               </div>
             )}
 

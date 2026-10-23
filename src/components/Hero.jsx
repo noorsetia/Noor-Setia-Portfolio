@@ -303,13 +303,13 @@ export default function Hero({ onOpenCommandPalette }) {
             <Reveal direction="up" delay={50}>
               <div 
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-[#12171A] border border-slate-200 dark:border-[#C5F54A]/30 text-slate-800 dark:text-[#C5F54A] text-xs font-mono mb-5 hover:border-[#C5F54A]/60 transition-colors cursor-default shadow-sm"
-                title="System Status: Open to Full Stack & Frontend opportunities"
+                title="Available for internship and full-time frontend and full-stack roles"
               >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C5F54A] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C5F54A]"></span>
                 </span>
-                <span className="font-semibold text-slate-900 dark:text-[#C5F54A]">Available for Opportunities</span>
+                <span className="font-semibold text-slate-900 dark:text-[#C5F54A]">Internship & Full-Time Roles</span>
                 <span className="text-slate-400 dark:text-slate-600">·</span>
                 <span className="text-slate-600 dark:text-slate-300">Full Stack & Frontend</span>
               </div>

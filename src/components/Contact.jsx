@@ -121,7 +121,7 @@ export default function Contact() {
             </h2>
             <div className="w-16 h-1 bg-[#C5F54A] mt-4 rounded-full" aria-hidden="true"></div>
             <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg max-w-xl mt-4">
-              Open to Frontend and Full Stack opportunities. Let's discuss engineering roles, project collaborations, or developer ideas.
+              Open to internships and full-time roles in frontend and full-stack development. Let's discuss engineering roles, project collaborations, or developer ideas.
             </p>
           </div>
         </Reveal>

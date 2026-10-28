@@ -3,7 +3,7 @@ export const experiences = [
     type: "Work",
     title: "Full Stack Developer Intern",
     organization: "Vedonyx",
-    date: "2025",
+    date: "Mar 2026 – Jun 2026",
     technologies: ["React", "JavaScript", "Node.js", "Express.js", "REST APIs", "MongoDB", "Git"],
     details: [
       "Built reusable React and JavaScript components for full-stack web application workflows.",

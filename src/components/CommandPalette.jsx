@@ -12,6 +12,7 @@ export default function CommandPalette({ isOpen, onClose, onToggleTheme, isDarkM
     { id: 'skills', label: 'Go to Technical Arsenal & Skills', category: 'Navigation', icon: '↗', action: () => scrollTo('#skills') },
     { id: 'projects', label: 'Go to Production Projects', category: 'Navigation', icon: '↗', action: () => scrollTo('#projects') },
     { id: 'experience', label: 'Go to Experience & Timeline', category: 'Navigation', icon: '↗', action: () => scrollTo('#experience') },
+    { id: 'certifications', label: 'Go to Certifications & Credentials', category: 'Navigation', icon: '↗', action: () => scrollTo('#certifications') },
     { id: 'contact', label: 'Go to Contact & Direct Channels', category: 'Navigation', icon: '↗', action: () => scrollTo('#contact') },
     { id: 'theme', label: `Switch to ${isDarkMode ? 'Light' : 'Dark'} Theme`, category: 'Preferences', icon: isDarkMode ? '☀' : '☾', action: onToggleTheme },
     { id: 'copy-email', label: 'Copy Email Address', category: 'Quick Action', icon: '📋', action: () => copyText(personalInfo.email) },

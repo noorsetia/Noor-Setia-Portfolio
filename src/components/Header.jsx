@@ -20,7 +20,7 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
       }
 
       // Scroll spy for active section
-      const sections = ['about', 'skills', 'projects', 'experience', 'contact'];
+      const sections = ['about', 'skills', 'projects', 'experience', 'certifications', 'contact'];
       let current = '';
       for (const sectionId of sections) {
         const el = document.getElementById(sectionId);
@@ -59,6 +59,7 @@ export default function Header({ isDarkMode, onToggleTheme, onOpenCommandPalette
     { name: 'Skills', href: '#skills', id: 'skills' },
     { name: 'Projects', href: '#projects', id: 'projects' },
     { name: 'Experience', href: '#experience', id: 'experience' },
+    { name: 'Certificates', href: '#certifications', id: 'certifications' },
     { name: 'Contact', href: '#contact', id: 'contact' },
   ];
 

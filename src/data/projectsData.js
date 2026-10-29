@@ -155,5 +155,40 @@ export const projectsData = [
       "REST API integration with Node.js and Express for contact and inquiry processing",
       "MongoDB database operations for membership signups and inquiry persistence"
     ]
+  },
+  {
+    id: 5,
+    title: "Developer Arcade — Interactive Gaming Platform",
+    category: "Full Stack",
+    status: "Completed",
+    description: "An interactive browser-based arcade featuring 15 playable mini-games, game-specific themes, player progression, and an achievement system.",
+    tags: ["React", "TypeScript", "Node.js", "Express.js", "MongoDB"],
+    screenshotUrl: null,
+    previewType: "illustration",
+    showSummaryOnly: true,
+    problem: "Players need an engaging browser-based place to explore multiple mini-games and track their progression.",
+    intendedUsers: "Players looking for interactive mini-games in a themed browser experience.",
+    contribution: [
+      "Built an interactive browser-based gaming platform with multiple mini-games, themed interfaces, player progression, and achievements.",
+      "Used interactive audio to support the gameplay experience."
+    ],
+    caseStudyFeatures: [
+      { title: "Multiple mini-games", description: "The platform brings several interactive browser games together in one place." },
+      { title: "Game-specific themes", description: "Each game has a themed visual presentation for a more immersive experience." },
+      { title: "Player progression", description: "Players can progress through levels and earn achievements." },
+      { title: "Interactive audio", description: "Gameplay includes interactive audio using the Web Audio API." }
+    ],
+    architecture: ["React + TypeScript", "Node.js + Express.js", "MongoDB", "CSS + Web Audio API"],
+    architectureSummary: "The platform combines a React and TypeScript browser interface with a Node.js and Express.js backend and MongoDB. CSS and the Web Audio API support the visual and audio experience.",
+    challenge: "Bringing multiple games together while giving each a distinct theme and retaining a consistent progression experience.",
+    liveLink: "https://arcade-game-t5d8.vercel.app/",
+    repoLink: "https://github.com/noorsetia/Arcade-Game",
+    backendRepoLink: null,
+    verifiedCapabilities: [
+      "Multiple interactive browser-based mini-games",
+      "Game-specific themes and immersive visual design",
+      "Player levels and an achievement system",
+      "Interactive audio using the Web Audio API"
+    ]
   }
 ];

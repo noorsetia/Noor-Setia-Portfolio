@@ -8,12 +8,14 @@ import React, { useState } from 'react';
  * 2. CareSync (Healthcare Patient Portal & Appointment Workflow)
  * 3. World Countries Data Explorer (Demographic Data & Chart Visuals)
  * 4. GYM Platform (Fitness Regimens & BMI Calculator Widget)
+ * 5. Developer Arcade (Mini-Games & Player Progression)
  * 
  * Allows toggling between 'Application Preview' and 'Architecture Blueprint'.
  */
 export default function ProjectVisual({ project, className = "", isModal = false }) {
   const [activeTab, setActiveTab] = useState(isModal ? 'blueprint' : 'preview');
   const [imageError, setImageError] = useState(false);
+  const isScreenshot = project.previewType !== 'illustration';
 
   // If a real screenshot file is supplied and loaded
   if (project.screenshotUrl && !imageError) {
@@ -21,7 +23,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
       <div className={`relative overflow-hidden w-full ${isModal ? 'aspect-[16/9] max-h-80' : 'aspect-[16/10]'} bg-slate-900 ${className}`}>
         <img
           src={project.screenshotUrl}
-          alt={`Interface screenshot of ${project.title}`}
+          alt={project.screenshotAlt || `Interface screenshot of ${project.title}`}
           onError={() => setImageError(true)}
           loading={isModal ? 'eager' : 'lazy'}
           decoding="async"
@@ -30,6 +32,11 @@ export default function ProjectVisual({ project, className = "", isModal = false
           className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-80 pointer-events-none" />
+        {!isScreenshot && (
+          <span className="absolute top-3 left-3 z-10 rounded-md border border-white/15 bg-slate-950/80 px-2 py-1 text-[10px] font-mono font-semibold text-slate-300 backdrop-blur-sm">
+            Illustrative preview
+          </span>
+        )}
       </div>
     );
   }
@@ -122,7 +129,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
           Razorpay Gateway • Google OAuth • Zustand
         </span>
         <span className="text-[#C5F54A] font-semibold shrink-0 ml-1">
-          {project.screenshotUrl ? 'Live Preview ↗' : 'Illustrative ↗'}
+          {isScreenshot ? 'Live Preview ↗' : 'Illustrative ↗'}
         </span>
       </div>
     </div>
@@ -288,6 +295,71 @@ export default function ProjectVisual({ project, className = "", isModal = false
     </div>
   );
 
+  // 5. Developer Arcade — animated neon mini-game platform preview
+  const renderArcadePreview = () => (
+    <div className="relative h-full w-full overflow-hidden bg-[#090817] text-slate-100 flex flex-col justify-between p-3 sm:p-4 text-[8px] select-none">
+      <div className="absolute inset-0 opacity-25 bg-[linear-gradient(rgba(131,167,255,.16)_1px,transparent_1px),linear-gradient(90deg,rgba(131,167,255,.16)_1px,transparent_1px)] bg-[size:28px_28px]" aria-hidden="true" />
+      <div className="absolute -right-8 -top-20 h-40 w-40 rounded-full border-2 border-violet-500/25 animate-spin-slow" aria-hidden="true" />
+
+      <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+        <div className="flex items-center gap-1.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-cyan-400/15 text-cyan-300 border border-cyan-300/30">✦</span>
+          <span className="font-bold tracking-wide text-white">DEVELOPER ARCADE</span>
+          <span className="ml-1 rounded border border-cyan-400/20 bg-cyan-400/[0.08] px-1.5 py-0.5 font-mono text-[7px] text-cyan-200">15 GAMES</span>
+        </div>
+        <span className="rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-1 font-mono text-[7px] text-slate-300">
+          <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />LVL 1
+        </span>
+      </div>
+
+      <div className="relative z-10 flex min-h-0 flex-1 gap-2 py-2">
+        <div className="flex w-[62%] min-w-0 flex-col rounded-lg border border-cyan-400/20 bg-[#0B1022]/90 p-2 shadow-[0_0_18px_rgba(34,211,238,.08)]">
+          <div className="mb-1 flex items-center justify-between gap-1">
+            <span className="font-mono text-[7px] uppercase tracking-wider text-cyan-200">Featured challenge</span>
+            <span className="rounded bg-violet-500/15 px-1 py-0.5 font-mono text-[7px] text-violet-200">ARCADE</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] sm:text-xs font-bold text-white">Neon Maze</span>
+            <span className="text-cyan-300">✦</span>
+          </div>
+          <div className="relative my-1.5 flex flex-1 items-center justify-center overflow-hidden rounded-md border border-cyan-400/25 bg-[#050713]">
+            <div className="absolute inset-x-2 top-2 h-px bg-cyan-300/60 shadow-[0_0_6px_2px_rgba(34,211,238,.4)]" />
+            <div className="absolute inset-x-2 bottom-2 h-px bg-cyan-300/60 shadow-[0_0_6px_2px_rgba(34,211,238,.4)]" />
+            <div className="grid h-4/5 w-4/5 grid-cols-7 grid-rows-3 gap-1 opacity-80" aria-hidden="true">
+              {Array.from({ length: 21 }, (_, cell) => {
+                const walls = [1, 3, 5, 8, 10, 13, 15, 17];
+                const wall = walls.includes(cell);
+                const player = cell === 14;
+                const exit = cell === 20;
+                return <span key={cell} className={`rounded-[2px] ${wall ? 'bg-violet-500/70 shadow-[0_0_4px_rgba(139,92,246,.65)]' : 'bg-white/[0.03]'} ${player ? 'bg-cyan-300 shadow-[0_0_8px_3px_rgba(34,211,238,.7)] animate-pulse' : ''} ${exit ? 'bg-fuchsia-400 shadow-[0_0_7px_2px_rgba(217,70,239,.7)] animate-pulse-subtle' : ''}`} />;
+              })}
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-1 font-mono text-[7px] text-slate-400">
+            <span>PROCEDURAL LABYRINTH</span><span className="text-cyan-200">PLAY ↗</span>
+          </div>
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-fuchsia-400/20 bg-fuchsia-500/[0.06] px-1.5">
+            <span className="text-fuchsia-300">⌘</span><span className="truncate font-semibold text-slate-200">Cyber Hacker</span><span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-fuchsia-400 animate-pulse" />
+          </div>
+          <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-violet-400/20 bg-violet-500/[0.06] px-1.5">
+            <span className="text-violet-300">▦</span><span className="truncate font-semibold text-slate-200">Memory Matrix</span><span className="ml-auto grid grid-cols-2 gap-0.5"><i className="h-1 w-1 rounded-sm bg-cyan-300 animate-pulse"/><i className="h-1 w-1 rounded-sm bg-violet-300"/><i className="h-1 w-1 rounded-sm bg-fuchsia-300"/><i className="h-1 w-1 rounded-sm bg-cyan-300"/></span>
+          </div>
+          <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-cyan-400/20 bg-cyan-500/[0.06] px-1.5">
+            <span className="text-cyan-300">⇅</span><span className="truncate font-semibold text-slate-200">Gravity Flip</span><span className="ml-auto text-[7px] text-cyan-200">3–5 MIN</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative z-10 flex items-center justify-between gap-2 border-t border-white/[0.08] pt-1.5 font-mono text-[7px] text-slate-400">
+        <div className="flex items-center gap-1.5"><span className="shrink-0 text-cyan-200">LVL 1 · 150 XP</span><span className="h-1 w-12 overflow-hidden rounded-full bg-white/10"><span className="block h-full w-1/2 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500" /></span></div>
+        <span className="shrink-0 text-violet-200">16 TROPHY BADGES</span>
+      </div>
+    </div>
+  );
+
   // High-Fidelity Architecture Blueprint View (available in modal or on toggle)
   const renderArchitectureBlueprint = () => (
     <div className="h-full w-full bg-slate-900 dark:bg-[#0B0F13] flex flex-col justify-between p-4 sm:p-6 select-none relative overflow-hidden">
@@ -334,7 +406,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
           {project.id === 4 && "MERN Stack • Health Metrics Engine • REST APIs"}
         </span>
         <span className="text-[#C5F54A] font-semibold shrink-0 ml-2">
-          {project.screenshotUrl ? 'Verified Specs' : 'Illustrative preview'}
+          {isScreenshot ? 'Verified Specs' : 'Illustrative preview'}
         </span>
       </div>
     </div>
@@ -350,7 +422,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
             onClick={() => setActiveTab('preview')}
             className={`px-2.5 py-1 rounded transition-colors ${activeTab === 'preview' ? 'bg-[#C5F54A] text-slate-950 font-bold' : 'text-slate-400 hover:text-white'}`}
           >
-            {project.screenshotUrl ? 'Live Preview' : 'Illustration'}
+            {isScreenshot ? 'Live Preview' : 'Illustration'}
           </button>
           <button
             type="button"
@@ -367,7 +439,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
         renderArchitectureBlueprint()
       ) : (
         <>
-          {!project.screenshotUrl && (
+          {project.id !== 5 && (!project.screenshotUrl || !isScreenshot) && (
             <span className="absolute top-3 left-3 z-10 rounded-md border border-white/15 bg-slate-950/80 px-2 py-1 text-[10px] font-mono font-semibold text-slate-300 backdrop-blur-sm">
               Illustrative preview
             </span>
@@ -376,6 +448,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
           {project.id === 2 && renderCareSyncPreview()}
           {project.id === 3 && renderWorldVisualPreview()}
           {project.id === 4 && renderGymPreview()}
+          {project.id === 5 && renderArcadePreview()}
         </>
       )}
     </div>

@@ -117,7 +117,7 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
             {project.description}
           </p>
 
-          <div className="grid gap-3 mb-6 text-xs sm:text-sm">
+          {project.showSummaryOnly !== true && <div className="grid gap-3 mb-6 text-xs sm:text-sm">
             <div>
               <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Problem</span>
               <p className="mt-1 text-slate-600 dark:text-slate-300 leading-relaxed">{project.problem}</p>
@@ -126,9 +126,9 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
               <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">My contribution</span>
               <p className="mt-1 text-slate-600 dark:text-slate-300 leading-relaxed">{project.contribution[0]}</p>
             </div>
-          </div>
+          </div>}
 
-          <div className="mb-6">
+          {project.showSummaryOnly !== true && <div className="mb-6">
             <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Key features</span>
             <ul className="mt-2 grid gap-1.5 text-xs text-slate-600 dark:text-slate-300" aria-label={`Key features of ${project.title}`}>
               {project.caseStudyFeatures.slice(0, 3).map((feature) => (
@@ -138,7 +138,7 @@ function ProjectCardItem({ project, index, onOpenProjectModal }) {
                 </li>
               ))}
             </ul>
-          </div>
+          </div>}
           
           {/* Verified Tech Tags */}
           <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6" aria-label="Technologies used">

@@ -9,6 +9,7 @@ import React, { useState } from 'react';
  * 3. World Countries Data Explorer (Demographic Data & Chart Visuals)
  * 4. GYM Platform (Fitness Regimens & BMI Calculator Widget)
  * 5. Developer Arcade (Mini-Games & Player Progression)
+ * 6. JiraProj (Dark animated Kanban demo — illustrative, not the live screen)
  * 
  * Allows toggling between 'Application Preview' and 'Architecture Blueprint'.
  */
@@ -345,20 +346,126 @@ export default function ProjectVisual({ project, className = "", isModal = false
             <span className="text-fuchsia-300">⌘</span><span className="truncate font-semibold text-slate-200">Cyber Hacker</span><span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-fuchsia-400 animate-pulse" />
           </div>
           <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-violet-400/20 bg-violet-500/[0.06] px-1.5">
-            <span className="text-violet-300">▦</span><span className="truncate font-semibold text-slate-200">Memory Matrix</span><span className="ml-auto grid grid-cols-2 gap-0.5"><i className="h-1 w-1 rounded-sm bg-cyan-300 animate-pulse"/><i className="h-1 w-1 rounded-sm bg-violet-300"/><i className="h-1 w-1 rounded-sm bg-fuchsia-300"/><i className="h-1 w-1 rounded-sm bg-cyan-300"/></span>
+            <span className="text-violet-300">▦</span><span className="truncate font-semibold text-slate-200">Memory Matrix</span><span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300 animate-pulse" />
           </div>
           <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-cyan-400/20 bg-cyan-500/[0.06] px-1.5">
-            <span className="text-cyan-300">⇅</span><span className="truncate font-semibold text-slate-200">Gravity Flip</span><span className="ml-auto text-[7px] text-cyan-200">3–5 MIN</span>
+            <span className="text-cyan-300">⇅</span><span className="truncate font-semibold text-slate-200">Gravity Flip</span><span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400 animate-pulse" />
+          </div>
+          <div className="flex flex-1 items-center justify-between gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-1.5 font-mono">
+            <span className="text-[7px] text-slate-400">ACHIEVEMENTS</span><span className="text-[7px] font-semibold text-violet-200">8 / 16</span>
           </div>
         </div>
       </div>
 
       <div className="relative z-10 flex items-center justify-between gap-2 border-t border-white/[0.08] pt-1.5 font-mono text-[7px] text-slate-400">
         <div className="flex items-center gap-1.5"><span className="shrink-0 text-cyan-200">LVL 1 · 150 XP</span><span className="h-1 w-12 overflow-hidden rounded-full bg-white/10"><span className="block h-full w-1/2 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500" /></span></div>
-        <span className="shrink-0 text-violet-200">16 TROPHY BADGES</span>
+        <span className="shrink-0 text-slate-300">React · Vite · Tailwind · Gemini</span>
       </div>
     </div>
   );
+
+  // 6. JiraProj — dark, animated Kanban illustration (demo board, not the live screen)
+  const renderJiraProjPreview = () => {
+    const columns = [
+      {
+        name: 'To Do',
+        tone: 'border-slate-400/20 bg-white/[0.03]',
+        dot: 'bg-slate-400',
+        cards: ['Role checks', 'Sprint dates']
+      },
+      {
+        name: 'Active',
+        tone: 'border-cyan-400/25 bg-cyan-500/[0.06]',
+        dot: 'bg-cyan-300',
+        cards: ['Board order']
+      },
+      {
+        name: 'Review',
+        tone: 'border-violet-400/25 bg-violet-500/[0.06]',
+        dot: 'bg-violet-300',
+        cards: ['Blocked flag']
+      },
+      {
+        name: 'Done',
+        tone: 'border-[#C5F54A]/25 bg-[#C5F54A]/[0.06]',
+        dot: 'bg-[#C5F54A]',
+        cards: ['Live rooms']
+      }
+    ];
+
+    return (
+      <div className="relative h-full w-full overflow-hidden bg-[#090817] text-slate-100 flex flex-col justify-between p-3 sm:p-4 text-[8px] select-none">
+        <div className="absolute inset-0 opacity-25 bg-[linear-gradient(rgba(131,167,255,.16)_1px,transparent_1px),linear-gradient(90deg,rgba(131,167,255,.16)_1px,transparent_1px)] bg-[size:28px_28px]" aria-hidden="true" />
+        <div className="jira-blob pointer-events-none absolute -left-10 -top-12 h-36 w-36 rounded-full bg-cyan-500/20 blur-2xl" aria-hidden="true" />
+        <div className="jira-blob pointer-events-none absolute -right-8 bottom-0 h-32 w-32 rounded-full bg-violet-500/20 blur-2xl [animation-delay:-4s]" aria-hidden="true" />
+        <div className="absolute -right-8 -top-20 h-40 w-40 rounded-full border-2 border-cyan-400/20 animate-spin-slow" aria-hidden="true" />
+
+        <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-cyan-300/30 bg-cyan-400/15 font-bold text-cyan-200">J</span>
+            <span className="font-bold tracking-wide text-white">JIRAPROJ</span>
+            <span className="rounded border border-cyan-400/20 bg-cyan-400/[0.08] px-1.5 py-0.5 font-mono text-[7px] text-cyan-200">DEMO BOARD</span>
+          </div>
+          <span className="rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-1 font-mono text-[7px] text-slate-300">
+            <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />LIVE
+          </span>
+        </div>
+
+        <div className="relative z-10 flex min-h-0 flex-1 gap-2 py-2">
+          <div className="relative flex w-[68%] min-w-0 flex-col rounded-lg border border-cyan-400/20 bg-[#0B1022]/90 p-2 shadow-[0_0_18px_rgba(34,211,238,.08)]">
+            <div className="mb-1.5 flex items-center justify-between gap-1">
+              <span className="font-mono text-[7px] uppercase tracking-wider text-cyan-200">Sprint board</span>
+              <span className="rounded bg-violet-500/15 px-1 py-0.5 font-mono text-[7px] text-violet-200">KANBAN</span>
+            </div>
+            <div className="grid min-h-0 flex-1 grid-cols-4 gap-1">
+              {columns.map((column) => (
+                <div key={column.name} className={`flex min-h-0 flex-col gap-1 rounded-md border px-1 py-1 ${column.tone}`}>
+                  <div className="flex items-center gap-1 font-mono text-[6px] uppercase tracking-wide text-slate-300">
+                    <span className={`h-1 w-1 shrink-0 rounded-full ${column.dot}`} />
+                    <span className="truncate">{column.name}</span>
+                  </div>
+                  {column.cards.map((card) => (
+                    <div key={card} className="truncate rounded border border-white/10 bg-[#090817]/80 px-1 py-1 text-[7px] font-medium text-slate-200">
+                      {card}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="jira-moving-ticket pointer-events-none absolute left-[8%] top-[46%] z-10 w-[18%] truncate rounded border border-cyan-300/50 bg-cyan-400/15 px-1 py-1 text-[7px] font-semibold text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.35)]">
+              AI draft
+            </div>
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+            <div className="flex flex-1 flex-col justify-center gap-1 rounded-lg border border-cyan-400/20 bg-cyan-500/[0.06] px-1.5">
+              <div className="flex items-center justify-between font-mono text-[7px] text-slate-300">
+                <span>SPRINT</span>
+                <span className="font-semibold text-cyan-200">64%</span>
+              </div>
+              <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
+                <div className="jira-progress-bar h-1 rounded-full bg-gradient-to-r from-cyan-400 to-[#C5F54A]" style={{ '--jira-progress': '64%' }} />
+              </div>
+            </div>
+            <div className="relative flex flex-1 items-center gap-1.5 overflow-hidden rounded-lg border border-violet-400/20 bg-violet-500/[0.06] px-1.5">
+              <span className="text-violet-200">✦</span>
+              <span className="truncate font-semibold text-slate-200">AI assistant</span>
+              <span className="jira-sweep pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-violet-300/20 to-transparent" aria-hidden="true" />
+            </div>
+            <div className="jira-status-tile flex flex-1 items-center justify-between gap-1 rounded-lg border px-1.5 font-mono">
+              <span className="text-[7px] text-slate-400">SOCKET</span>
+              <span className="text-[7px] font-semibold text-[#C5F54A]">syncing</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 flex items-center justify-between gap-2 border-t border-white/[0.08] pt-1.5 font-mono text-[7px] text-slate-400">
+          <span className="truncate text-cyan-200">Demo board · sample tasks</span>
+          <span className="shrink-0 text-slate-300">React · Socket.IO · OpenAI</span>
+        </div>
+      </div>
+    );
+  };
 
   // High-Fidelity Architecture Blueprint View (available in modal or on toggle)
   const renderArchitectureBlueprint = () => (
@@ -404,8 +511,10 @@ export default function ProjectVisual({ project, className = "", isModal = false
           {project.id === 2 && "React SPA • React Router • Modular Hierarchy"}
           {project.id === 3 && "JavaScript (ES6+) • Chart.js • Real-time Filter"}
           {project.id === 4 && "MERN Stack • Health Metrics Engine • REST APIs"}
+          {project.id === 5 && "React.js • Vite • Tailwind CSS • Motion • Express API"}
+          {project.id === 6 && "MERN Stack • Socket.IO Realtime • AI Assistant"}
         </span>
-        <span className="text-[#C5F54A] font-semibold shrink-0 ml-2">
+        <span className={isScreenshot ? 'text-slate-600 font-semibold shrink-0 ml-2' : 'text-[#C5F54A] font-semibold shrink-0 ml-2'}>
           {isScreenshot ? 'Verified Specs' : 'Illustrative preview'}
         </span>
       </div>
@@ -439,9 +548,9 @@ export default function ProjectVisual({ project, className = "", isModal = false
         renderArchitectureBlueprint()
       ) : (
         <>
-          {project.id !== 5 && (!project.screenshotUrl || !isScreenshot) && (
+          {project.id !== 5 && project.id !== 6 && (!project.screenshotUrl || !isScreenshot) && (
             <span className="absolute top-3 left-3 z-10 rounded-md border border-white/15 bg-slate-950/80 px-2 py-1 text-[10px] font-mono font-semibold text-slate-300 backdrop-blur-sm">
-              Illustrative preview
+              {project.previewLabel || 'Illustrative preview'}
             </span>
           )}
           {project.id === 1 && renderNestoraPreview()}
@@ -449,6 +558,7 @@ export default function ProjectVisual({ project, className = "", isModal = false
           {project.id === 3 && renderWorldVisualPreview()}
           {project.id === 4 && renderGymPreview()}
           {project.id === 5 && renderArcadePreview()}
+          {project.id === 6 && renderJiraProjPreview()}
         </>
       )}
     </div>

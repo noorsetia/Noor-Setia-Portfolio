@@ -468,3 +468,66 @@
 .animate-spin-reverse-slow {
   animation: smoothSpin 16s linear infinite reverse;
 }
+
+/* JiraProj preview: dark board motion */
+@keyframes jiraProjProgress {
+  0% { width: 0%; }
+  22%, 78% { width: var(--jira-progress, 100%); }
+  100% { width: var(--jira-progress, 100%); }
+}
+
+@keyframes jiraProjStatusPulse {
+  0%, 100% { border-color: rgba(197, 245, 74, 0.18); background-color: rgba(197, 245, 74, 0.04); }
+  50% { border-color: rgba(197, 245, 74, 0.7); background-color: rgba(197, 245, 74, 0.12); }
+}
+
+@keyframes jiraProjDrift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-14px, 10px, 0); }
+}
+
+@keyframes jiraProjSweep {
+  0% { transform: translateX(-120%); }
+  55%, 100% { transform: translateX(220%); }
+}
+
+@keyframes jiraTicketTravel {
+  0%, 14% { transform: translateX(0); opacity: 1; }
+  38%, 52% { transform: translateX(130%); opacity: 1; }
+  76%, 88% { transform: translateX(260%); opacity: 1; }
+  100% { transform: translateX(390%); opacity: 0.2; }
+}
+
+.jira-progress-bar {
+  animation: jiraProjProgress 5.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.jira-status-tile {
+  animation: jiraProjStatusPulse 3.2s ease-in-out infinite;
+}
+
+.jira-blob {
+  animation: jiraProjDrift 9s ease-in-out infinite;
+}
+
+.jira-sweep {
+  animation: jiraProjSweep 3.6s ease-in-out infinite;
+}
+
+.jira-moving-ticket {
+  animation: jiraTicketTravel 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jira-progress-bar,
+  .jira-status-tile,
+  .jira-blob,
+  .jira-sweep,
+  .jira-moving-ticket {
+    animation: none;
+  }
+
+  .jira-progress-bar {
+    width: var(--jira-progress, 100%);
+  }
+}

@@ -162,24 +162,25 @@ export const projectsData = [
     category: "Full Stack",
     status: "Completed",
     description: "An interactive browser-based arcade featuring 15 playable mini-games, game-specific themes, player progression, and an achievement system.",
-    tags: ["React", "TypeScript", "Node.js", "Express.js", "MongoDB"],
+    tags: ["React.js", "Vite", "Tailwind CSS", "Lucide React", "Motion", "Node.js", "Express.js", "MongoDB", "Mongoose", "Firebase", "Zod", "Google Gemini API"],
     screenshotUrl: null,
     previewType: "illustration",
-    showSummaryOnly: true,
+    previewLabel: "Illustrative interface preview",
     problem: "Players need an engaging browser-based place to explore multiple mini-games and track their progression.",
     intendedUsers: "Players looking for interactive mini-games in a themed browser experience.",
     contribution: [
-      "Built an interactive browser-based gaming platform with multiple mini-games, themed interfaces, player progression, and achievements.",
-      "Used interactive audio to support the gameplay experience."
+      "Built 15 playable browser mini-games inside one React and Vite app, each with its own theme and controls.",
+      "Added player progression with levels and an achievement system backed by the Node.js and Express.js API.",
+      "Styled the interface with Tailwind CSS, animated it with Motion, and added Firebase authentication and AI features through the Google Gemini API."
     ],
     caseStudyFeatures: [
-      { title: "Multiple mini-games", description: "The platform brings several interactive browser games together in one place." },
-      { title: "Game-specific themes", description: "Each game has a themed visual presentation for a more immersive experience." },
-      { title: "Player progression", description: "Players can progress through levels and earn achievements." },
-      { title: "Interactive audio", description: "Gameplay includes interactive audio using the Web Audio API." }
+      { title: "15 mini-games", description: "Fifteen distinct games share one arcade shell, so players move between them without leaving the app." },
+      { title: "Game-specific themes", description: "Each game carries its own visual theme, separating it from the rest of the arcade." },
+      { title: "Player progression", description: "Levels and achievements give players a reason to return across games." },
+      { title: "Animated UI", description: "Motion drives the interface animation, with Lucide React icons and Tailwind CSS styling throughout." }
     ],
-    architecture: ["React + TypeScript", "Node.js + Express.js", "MongoDB", "CSS + Web Audio API"],
-    architectureSummary: "The platform combines a React and TypeScript browser interface with a Node.js and Express.js backend and MongoDB. CSS and the Web Audio API support the visual and audio experience.",
+    architecture: ["React.js + Vite", "Tailwind CSS + Motion", "Node.js + Express.js", "MongoDB / Mongoose", "Firebase Auth + Google Gemini API"],
+    architectureSummary: "The platform combines a React.js and Vite browser interface styled with Tailwind CSS and animated with Motion with a Node.js and Express.js backend and MongoDB through Mongoose. Firebase Authentication handles sign-in, Zod validates requests, and the Google Gemini API powers the in-app AI features.",
     challenge: "Bringing multiple games together while giving each a distinct theme and retaining a consistent progression experience.",
     liveLink: "https://arcade-game-t5d8.vercel.app/",
     repoLink: "https://github.com/noorsetia/Arcade-Game",
@@ -188,7 +189,50 @@ export const projectsData = [
       "Multiple interactive browser-based mini-games",
       "Game-specific themes and immersive visual design",
       "Player levels and an achievement system",
-      "Interactive audio using the Web Audio API"
+      "Firebase Authentication with Google Gemini API integration"
+    ]
+  },
+  {
+    id: 6,
+    title: "JiraProj — AI Project Management Platform",
+    category: "Full Stack + AI Integration",
+    status: "Completed",
+    description: "A Jira-style project management platform with projects, sprints, and a drag-and-drop Kanban board, team management under role-based access, real-time updates over Socket.IO, analytics dashboards, and an AI assistant that drafts tasks, plans sprints, and flags blocked work.",
+    tags: ["React", "Vite", "Tailwind CSS", "Node.js", "Express.js", "MongoDB", "Mongoose", "JWT", "Socket.IO", "OpenAI API"],
+    screenshotUrl: null,
+    previewType: "illustration",
+    previewLabel: "Illustrative interface preview",
+    screenshotPlaceholder: "Dark animated Kanban demo — sample board, not the live screen",
+    problem: "Teams need one workspace where projects, sprints, and tasks stay in sync, progress is visible at a glance, and role rules decide who can change what.",
+    intendedUsers: "Project managers planning sprints and work, and team members tracking and updating their assigned tasks.",
+    contribution: [
+      "Built the Express and MongoDB backend with JWT authentication, bcrypt password hashing, and project manager / team member role checks.",
+      "Implemented project, task, and sprint controllers, express-validator request validation, and a shared response envelope with a global error handler.",
+      "Built the React and Vite client with protected routes, a Kanban board with position-tracked drag and drop, analytics views, and read-only public preview pages.",
+      "Added Socket.IO project rooms for live task and project updates, plus an AI assistant layer for task generation, sprint planning, and issue detection."
+    ],
+    caseStudyFeatures: [
+      { title: "Kanban board", description: "Tasks move across To Do, In Progress, Review, and Done, with bulk position updates persisted through a dedicated endpoint." },
+      { title: "Sprints", description: "Sprints are created per project with goals and date ranges, and tasks are assigned to them with progress statistics." },
+      { title: "Role-based access", description: "Project managers get full CRUD and team performance data; team members are limited to their projects, status updates, and comments." },
+      { title: "Real-time updates", description: "Socket.IO project rooms push task and project changes to everyone viewing the same project." },
+      { title: "AI assistant", description: "Generates tasks from a description, suggests task priorities, drafts sprint plans, summarizes project progress, and detects blocked work." },
+      { title: "Public previews", description: "Read-only dashboard, project, calendar, and summary pages are served without authentication so the app can be explored without an account." }
+    ],
+    architecture: ["React + Vite", "Express REST API", "JWT auth middleware", "MongoDB / Mongoose", "Socket.IO"],
+    architectureSummary: "The React/Vite client calls an Express REST API over /api routes with a Bearer JWT on protected calls. Controllers validate requests with express-validator, apply role checks, and persist User, Project, Task, and Sprint models in MongoDB through Mongoose. Socket.IO project rooms broadcast task and project events, and a dedicated AI routes layer calls an OpenAI-compatible chat completions endpoint.",
+    challenge: "Keeping a drag-and-drop board responsive while task positions, status changes, and assignments are stored server-side led to a bulk position update endpoint and a shared task model that supports per-task comments, attachments, sprints, and user-specific notifications.",
+    // Verified Live Deployment & GitHub Repositories (HTTP 200):
+    liveLink: "https://jira-proj-frontend.vercel.app/public-dashboard",
+    repoLink: "https://github.com/noorsetia/JiraProj_Frontend",
+    backendRepoLink: "https://github.com/noorsetia/JiraProj_Backend",
+    verifiedCapabilities: [
+      "JWT authentication with bcrypt hashing and project manager / team member role checks",
+      "Project, task, and sprint CRUD APIs validated with express-validator",
+      "Kanban drag-and-drop ordering persisted through bulk position updates",
+      "Real-time task and project updates broadcast through Socket.IO project rooms",
+      "AI assistant endpoints for task generation, sprint planning, and issue detection",
+      "Analytics endpoints for dashboard, per-project, and team performance metrics"
     ]
   }
 ];
